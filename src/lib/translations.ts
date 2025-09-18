@@ -55,6 +55,7 @@ export const extendedTranslations = {
     'fertilizer': 'Fertilizer',
     'pestControl': 'Pest Control',
     'harvesting': 'Harvesting',
+    'analyzeImage': "Analyze"
   },
   
   hi: {
