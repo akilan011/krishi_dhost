@@ -40,12 +40,9 @@ const CameraDetection = () => {
       formData.append('image', blob, 'plant-image.jpg');
       
       // Call Supabase edge function
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const analysisResponse = await fetch(`${supabaseUrl}/functions/v1/plant-disease-detection`, {
+      const aiURL = import.meta.env.VITE_MODEL_URL;
+      const analysisResponse = await fetch(`${aiURL}/predict`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
         body: formData,
       });
       
@@ -62,7 +59,7 @@ const CameraDetection = () => {
       setResults(result);
       toast({
         title: "Analysis Complete",
-        description: `Detected: ${result.disease} (${result.confidence}% confidence)`,
+        description: `Detected: ${result.predicted_label}`,
       });
     } catch (error) {
       console.error('Error analyzing image:', error);
@@ -187,71 +184,10 @@ const CameraDetection = () => {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>{t('detectionResults')}</span>
-              <Badge variant={results.severity === "High" ? "destructive" : results.severity === "Moderate" ? "secondary" : "default"}>
-                {results.confidence}% {t('confidence')}
-              </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Disease Info */}
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <div className="flex items-center mb-2">
-                {results.severity === "High" ? (
-                  <AlertTriangle className="h-5 w-5 text-destructive mr-2" />
-                ) : (
-                  <CheckCircle className="h-5 w-5 text-success mr-2" />
-                )}
-                <h3 className="text-lg font-semibold">{results.disease}</h3>
-              </div>
-              <p className="text-sm text-muted-foreground mb-2">
-                <strong>{t('severity')}:</strong> {results.severity === "High" ? t('high') : results.severity === "Moderate" ? t('moderate') : t('low')}
-              </p>
-              <p className="text-sm">{results.description}</p>
-            </div>
-
-            {/* Detection Labels */}
-            {results.labels && results.labels.length > 0 && (
-              <div>
-                <h4 className="font-semibold mb-3 text-primary">🔍 {t('detectedFeatures') || 'Detected Features'}:</h4>
-                <div className="flex flex-wrap gap-2">
-                  {results.labels.map((label: any, index: number) => (
-                    <Badge key={index} variant="outline" className="text-xs">
-                      {label.description} ({label.score}%)
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Remedies */}
-            <div>
-              <h4 className="font-semibold mb-3 text-destructive">🩺 {t('immediateText')}:</h4>
-              <div className="space-y-2">
-                {results.remedies.map((remedy: string, index: number) => (
-                  <div key={index} className="flex items-start space-x-2">
-                    <span className="bg-destructive text-destructive-foreground text-xs px-2 py-1 rounded-full font-bold">
-                      {index + 1}
-                    </span>
-                    <p className="text-sm">{remedy}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Prevention */}
-            <div>
-              <h4 className="font-semibold mb-3 text-success">🛡️ {t('preventionTips')}:</h4>
-              <div className="space-y-2">
-                {results.prevention.map((tip: string, index: number) => (
-                  <div key={index} className="flex items-start space-x-2">
-                    <span className="bg-success text-success-foreground text-xs px-2 py-1 rounded-full font-bold">
-                      {index + 1}
-                    </span>
-                    <p className="text-sm">{tip}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            Predicted: {results.predicted_label}
           </CardContent>
         </Card>
       )}
