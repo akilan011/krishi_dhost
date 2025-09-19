@@ -50,20 +50,20 @@ const SplashScreen = () => {
       <div className="relative z-10 text-center px-6 max-w-md">
         {/* App Title */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2 drop-shadow-2xl text-center" style={{fontFamily: 'Times New Roman, serif'}}>
+          <h1 className="text-4xl font-bold mb-2 drop-shadow-2xl text-center" style={{fontFamily: 'Times New Roman, serif', color: '#E1D9D1'}}>
             {t('smartCropAdvisory')}
           </h1>
-          <h2 className="text-2xl font-semibold text-white drop-shadow-xl" style={{fontFamily: 'Times New Roman, serif'}}>
+          <h2 className="text-2xl font-semibold drop-shadow-xl" style={{fontFamily: 'Times New Roman, serif', color: '#E1D9D1'}}>
             {t('krishiDost')}
           </h2>
-          <p className="text-lg text-white mt-2 drop-shadow-lg" style={{fontFamily: 'Times New Roman, serif'}}>
+          <p className="text-lg mt-2 drop-shadow-lg" style={{fontFamily: 'Times New Roman, serif', color: '#E1D9D1'}}>
             {t('digitalFarmingCompanion')}
           </p>
         </div>
 
         {/* Language Selection */}
         <div className="mb-8">
-          <h3 className="text-xl font-semibold text-white mb-4 drop-shadow-xl" style={{fontFamily: 'Times New Roman, serif'}}>
+          <h3 className="text-xl font-semibold mb-4 drop-shadow-xl" style={{fontFamily: 'Times New Roman, serif', color: '#E1D9D1'}}>
             {t('chooseYourLanguage')}
           </h3>
           <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
