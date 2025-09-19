@@ -20,6 +20,7 @@ import ExpertHelp from "./components/ExpertHelp";
 import CameraDetection from "./components/CameraDetection";
 import AICropCalendar from "./components/AICropCalendar";
 import LocationPage from "./components/LocationPage";
+import Fertilizer from "./components/Fertilizer";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="government-schemes" element={<GovernmentSchemes />} />
               <Route path="expert-help" element={<ExpertHelp />} />
               <Route path="camera-detection" element={<CameraDetection />} />
+              <Route path="fertilizer" element={<Fertilizer />} />
               <Route path="location" element={<LocationPage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Wheat, TrendingUp, Building, UserCheck, Home, Camera, Calendar, MapPin } from "lucide-react";
+import { Wheat, TrendingUp, Building, UserCheck, Home, Camera, Calendar, MapPin, Sprout } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -45,6 +45,13 @@ export function AppSidebar() {
       icon: Calendar,
       descriptionKey: "smartFarmingCalendar",
       color: "hsl(269, 100%, 67%)" // Light Purple
+    },
+    {
+      titleKey: "fertilizer",
+      url: "/dashboard/fertilizer",
+      icon: Sprout,
+      descriptionKey: "fertilizerSuggestions",
+      color: "hsl(150, 70%, 40%)" // Fresh Green
     },
     {
       titleKey: "marketPrice",
