@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { User, Edit2, Save, X } from 'lucide-react';
+import { User, Edit2, Save, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
 export function UserProfile() {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const [farmerData, setFarmerData] = useState(() => {
     const data = localStorage.getItem('farmerData');
     return data ? JSON.parse(data) : null;
@@ -32,6 +34,11 @@ export function UserProfile() {
       setPasswordData({ current: '', new: '', confirm: '' });
       setShowPasswordChange(false);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('farmerData');
+    navigate('/');
   };
 
   return (
@@ -101,6 +108,9 @@ export function UserProfile() {
                     </Button>
                     <Button onClick={() => setShowPasswordChange(true)} variant="outline" size="sm">
                       Change Password
+                    </Button>
+                    <Button onClick={handleLogout} variant="destructive" size="sm">
+                      <LogOut className="h-4 w-4 mr-1" /> Logout
                     </Button>
                   </>
                 )}
