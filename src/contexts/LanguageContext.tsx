@@ -189,6 +189,8 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'next': 'Next',
     'welcome': 'Welcome',
     'loading': 'Loading...',
+    'newToKrishiDost': 'New to Krishi Dost?',
+    'createNewAccount': 'Create New Account',
   },
   hi: {
     // App Title & Welcome
@@ -308,6 +310,8 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'next': 'आगे',
     'welcome': 'स्वागत',
     'loading': 'लोड हो रहा है...',
+    'newToKrishiDost': 'कृषि दोस्त में नए हैं?',
+    'createNewAccount': 'नया खाता बनाएं',
     
     // Crop/Commodity translations
     'Rice': 'चावल',
@@ -567,6 +571,8 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'next': 'அடுத்து',
     'welcome': 'வரவேற்கிறோம்',
     'loading': 'ஏற்றுகிறது...',
+    'newToKrishiDost': 'கிருஷி தோஸ்ட்டில் புதியவரா?',
+    'createNewAccount': 'புதிய கணக்கை உருவாக்கவும்',
   },
   te: {
     // App Title & Welcome
@@ -712,6 +718,8 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'next': 'తదుపరి',
     'welcome': 'స్వాగతం',
     'loading': 'లోడ్ అవుతోంది...',
+    'newToKrishiDost': 'కృషి దోస్త్‌కు కొత్తవారా?',
+    'createNewAccount': 'కొత్త ఖాతా సృష్టించండి',
   },
   pa: {
     // App Title & Welcome
@@ -834,6 +842,8 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'next': 'ਅਗਲਾ',
     'welcome': 'ਸਵਾਗਤ',
     'loading': 'ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...',
+    'newToKrishiDost': 'ਕ੍ਰਿਸ਼ੀ ਦੋਸਤ ਵਿੱਚ ਨਵੇਂ ਹੋ?',
+    'createNewAccount': 'ਨਵਾਂ ਖਾਤਾ ਬਣਾਓ',
   },
   ur: {
     // App Title & Welcome
@@ -956,6 +966,8 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'next': 'اگلا',
     'welcome': 'خوش آمدید',
     'loading': 'لوڈ ہو رہا ہے...',
+    'newToKrishiDost': 'کرشی دوست میں نئے ہیں؟',
+    'createNewAccount': 'نیا اکاؤنٹ بنائیں',
   },
   ml: {
     // App Title & Welcome
@@ -1078,5 +1090,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'next': 'അടുത്തത്',
     'welcome': 'സ്വാഗതം',
     'loading': 'ലോഡ് ചെയ്യുന്നു...',
+    'newToKrishiDost': 'കൃഷി ദോസ്തിൽ പുതിയവരാണോ?',
+    'createNewAccount': 'പുതിയ അക്കൗണ്ട് സൃഷ്ടിക്കുക',
   }
 };
