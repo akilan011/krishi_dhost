@@ -35,7 +35,7 @@ const SplashScreen = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-agricultural relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden" style={{background: 'linear-gradient(135deg, #2d5016 0%, #3e6b1f 25%, #4a7c23 50%, #5a8f2a 75%, #6ba132 100%)'}}>
       {/* Theme Toggle */}
       <div className="absolute top-4 right-4 z-20">
         <ThemeToggle />
@@ -78,6 +78,7 @@ const SplashScreen = () => {
                     ? "bg-white/30 border-white/50 text-white" 
                     : "bg-white/10 border-white/20 text-white/90 hover:bg-white/20"
                 }`}
+                style={{fontFamily: 'Times New Roman, serif'}}
               >
                 {lang.name}
               </Button>
@@ -92,6 +93,7 @@ const SplashScreen = () => {
             onClick={handleTutorialVideo}
             variant="hero"
             className="w-full shadow-2xl"
+            style={{fontFamily: 'Times New Roman, serif'}}
           >
             <Play className="mr-3 h-5 w-5" />
             {t('tutorialVideo')}
@@ -101,7 +103,8 @@ const SplashScreen = () => {
           <Button 
             onClick={handleSkip}
             variant="outline"
-            className="w-full bg-white/10 border-white/20 text-white/90 hover:bg-white/20 hover:border-white/30"
+            className="w-full bg-white/10 border-white/20 text-white/90 hover:bg-white/20 hover:border-white/30 text-xl"
+            style={{fontFamily: 'Times New Roman, serif'}}
           >
             {t('skip')}
             <ArrowRight className="ml-3 h-5 w-5" />
