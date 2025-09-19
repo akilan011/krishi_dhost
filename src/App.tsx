@@ -9,6 +9,7 @@ import VoiceAssistant from "@/components/VoiceAssistant";
 import SplashScreen from "./components/SplashScreen";
 import LoginPage from "./components/LoginPage";
 import LoginCredentials from "./components/LoginCredentials";
+import RegisterPage from "./components/RegisterPage";
 import Dashboard from "./components/Dashboard";
 import DashboardHome from "./components/DashboardHome";
 import MyCrop from "./components/MyCrop";
@@ -33,8 +34,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<SplashScreen />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/login-credentials" element={<LoginCredentials />} />
+            <Route path="/login" element={<LoginCredentials />} />
+            <Route path="/register" element={<RegisterPage />} />
             <Route path="/crop-selection" element={<CropSelection />} />
             <Route path="/dashboard" element={<Dashboard />}>
               <Route index element={<DashboardHome />} />

@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { User, MapPin, LogIn, UserPlus, WifiOff } from "lucide-react";
+import { User, MapPin, LogIn, UserPlus, WifiOff, Lock } from "lucide-react";
 import farmerHero from "@/assets/farmer-hero.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -293,7 +293,7 @@ const LoginPage = () => {
   };
 
   const handleLogin = () => {
-    navigate("/login-credentials");
+    navigate("/login");
   };
 
   const handleRegister = () => {
@@ -311,26 +311,27 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-field">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-gray-900 dark:via-emerald-900/20 dark:to-gray-800">
       {/* Theme Toggle */}
       <div className="absolute top-4 right-4 z-20">
         <ThemeToggle />
       </div>
       {/* Header with Farmer Image */}
-      <div className="relative h-64 overflow-hidden">
+      <div className="relative h-72 overflow-hidden">
         <img 
           src={farmerHero} 
           alt="Farmer in field" 
-          className="w-full h-full object-cover opacity-90"
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 to-green-600/20" />
       </div>
 
       {/* Form Section */}
-      <div className="px-6 -mt-16 relative z-10">
-        <Card className="shadow-2xl border-0">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-2xl font-bold text-foreground">
+      <div className="px-6 -mt-20 relative z-10">
+        <Card className="shadow-2xl border-0 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95 rounded-3xl">
+          <CardHeader className="text-center pb-6 pt-8">
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
               {t('welcomeToKrishiDost')}
             </CardTitle>
           </CardHeader>
@@ -339,8 +340,8 @@ const LoginPage = () => {
             {/* Form Fields */}
             <div className="space-y-4">
               <div>
-                <Label htmlFor="name" className="text-base font-semibold">
-                  <User className="inline mr-2 h-4 w-4" />
+                <Label htmlFor="name" className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                  <User className="inline mr-2 h-4 w-4 text-emerald-600" />
                   {t('yourName')}
                 </Label>
                 <Input
@@ -348,23 +349,23 @@ const LoginPage = () => {
                   placeholder={t('enterFullName')}
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
-                  className="h-12 mt-2"
+                  className="h-14 mt-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300"
                 />
               </div>
 
               {/* State Selection */}
               <div>
-                <Label htmlFor="state" className="text-base font-semibold">
-                  <MapPin className="inline mr-2 h-4 w-4" />
+                <Label htmlFor="state" className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                  <MapPin className="inline mr-2 h-4 w-4 text-emerald-600" />
                   {t('state')}
                 </Label>
                 <Select onValueChange={(value) => handleInputChange("state", value)}>
-                  <SelectTrigger className="h-12 mt-2">
+                  <SelectTrigger className="h-14 mt-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
                     <SelectValue placeholder={t('selectState')} />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl border-2 border-gray-200 dark:border-gray-700">
                     {Object.entries(locationData).map(([key, state]) => (
-                      <SelectItem key={key} value={key}>
+                      <SelectItem key={key} value={key} className="rounded-lg">
                         {state.name}
                       </SelectItem>
                     ))}
@@ -375,17 +376,17 @@ const LoginPage = () => {
               {/* District Selection - Only show if state is selected */}
               {formData.state && (
                 <div>
-                  <Label htmlFor="district" className="text-base font-semibold">
-                    <MapPin className="inline mr-2 h-4 w-4" />
+                  <Label htmlFor="district" className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                    <MapPin className="inline mr-2 h-4 w-4 text-emerald-600" />
                     District
                   </Label>
                   <Select onValueChange={(value) => handleInputChange("district", value)} value={formData.district}>
-                    <SelectTrigger className="h-12 mt-2">
+                    <SelectTrigger className="h-14 mt-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
                       <SelectValue placeholder="Select District" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-xl border-2 border-gray-200 dark:border-gray-700">
                       {getDistricts(formData.state).map(([key, district]) => (
-                        <SelectItem key={key} value={key}>
+                        <SelectItem key={key} value={key} className="rounded-lg">
                           {district.name}
                         </SelectItem>
                       ))}
@@ -397,17 +398,17 @@ const LoginPage = () => {
               {/* Village Selection - Only show if district is selected */}
               {formData.district && formData.state && (
                 <div>
-                  <Label htmlFor="village" className="text-base font-semibold">
-                    <MapPin className="inline mr-2 h-4 w-4" />
+                  <Label htmlFor="village" className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                    <MapPin className="inline mr-2 h-4 w-4 text-emerald-600" />
                     Village
                   </Label>
                   <Select onValueChange={(value) => handleInputChange("village", value)} value={formData.village}>
-                    <SelectTrigger className="h-12 mt-2">
+                    <SelectTrigger className="h-14 mt-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
                       <SelectValue placeholder="Select Village" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-xl border-2 border-gray-200 dark:border-gray-700">
                       {getVillages(formData.state, formData.district).map((village) => (
-                        <SelectItem key={village} value={village}>
+                        <SelectItem key={village} value={village} className="rounded-lg">
                           {village}
                         </SelectItem>
                       ))}
@@ -417,7 +418,8 @@ const LoginPage = () => {
               )}
 
               <div>
-                <Label htmlFor="password" className="text-base font-semibold">
+                <Label htmlFor="password" className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                  <Lock className="inline mr-2 h-4 w-4 text-emerald-600" />
                   {t('password')}
                 </Label>
                 <Input
@@ -426,12 +428,13 @@ const LoginPage = () => {
                   placeholder={t('enterPassword')}
                   value={formData.password}
                   onChange={(e) => handleInputChange("password", e.target.value)}
-                  className="h-12 mt-2"
+                  className="h-14 mt-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300"
                 />
               </div>
 
               <div>
-                <Label htmlFor="confirmPassword" className="text-base font-semibold">
+                <Label htmlFor="confirmPassword" className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                  <Lock className="inline mr-2 h-4 w-4 text-emerald-600" />
                   {t('confirmPassword')}
                 </Label>
                 <Input
@@ -440,41 +443,34 @@ const LoginPage = () => {
                   placeholder={t('confirmYourPassword')}
                   value={formData.confirmPassword}
                   onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                  className="h-12 mt-2"
+                  className="h-14 mt-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300"
                 />
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3 pt-4">
+            <div className="space-y-3 pt-6">
               <Button 
                 onClick={handleLogin}
-                variant="farmer"
-                size="lg"
-                className="w-full"
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
               >
-                <LogIn className="mr-2 h-5 w-5" />
+                <LogIn className="mr-2 h-4 w-4" />
                 {t('login')}
               </Button>
 
               <Button 
-                onClick={handleRegister}
-                variant="harvest"
-                size="lg"
-                className="w-full"
-                disabled={!formData.password || !formData.confirmPassword || formData.password !== formData.confirmPassword}
+                onClick={() => navigate("/register")}
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
               >
-                <UserPlus className="mr-2 h-5 w-5" />
+                <UserPlus className="mr-2 h-4 w-4" />
                 {t('register')}
               </Button>
 
               <Button 
                 onClick={handleOfflineMode}
-                variant="outline"
-                size="lg"
-                className="w-full border-2"
+                className="w-full h-12 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold backdrop-blur-sm transition-all duration-300 transform hover:scale-[1.02]"
               >
-                <WifiOff className="mr-2 h-5 w-5" />
+                <WifiOff className="mr-2 h-4 w-4" />
                 {t('continueOffline')}
               </Button>
             </div>
