@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import VoiceAssistant from "@/components/VoiceAssistant";
@@ -23,6 +23,16 @@ import LocationPage from "./components/LocationPage";
 import Fertilizer from "./components/Fertilizer";
 import NotFound from "./pages/NotFound";
 
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const farmerData = localStorage.getItem('farmerData');
+  return farmerData ? <>{children}</> : <Navigate to="/" replace />;
+};
+
+const HomeRoute = () => {
+  const farmerData = localStorage.getItem('farmerData');
+  return farmerData ? <Navigate to="/dashboard" replace /> : <SplashScreen />;
+};
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -34,7 +44,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<SplashScreen />} />
+            <Route path="/" element={<HomeRoute />} />
             <Route path="/login" element={<LoginCredentials />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/crop-selection" element={<CropSelection />} />
