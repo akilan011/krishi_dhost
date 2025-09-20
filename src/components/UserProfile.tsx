@@ -37,8 +37,10 @@ export function UserProfile() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('farmerData');
-    navigate('/');
+    // Keep the registration data but mark as logged out
+    const updatedData = { ...farmerData, isLoggedIn: false };
+    localStorage.setItem('farmerData', JSON.stringify(updatedData));
+    navigate('/login');
   };
 
   return (

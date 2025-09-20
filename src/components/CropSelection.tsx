@@ -260,7 +260,7 @@ const CropSelection = () => {
               type="date"
               value={cropData.plantingDate}
               onChange={(e) => handleInputChange("plantingDate", e.target.value)}
-              className="h-14 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300"
+              className="h-14 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300 dark:text-white dark:[color-scheme:dark]"
             />
           </div>
 

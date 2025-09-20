@@ -82,7 +82,7 @@ export function LocationDisplay({ onLocationChange }: { onLocationChange?: () =>
   };
 
   return (
-    <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${theme === 'dark' ? 'bg-white text-black' : 'bg-green-100 text-green-800'}`}>
+    <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg border-2 ${theme === 'dark' ? 'bg-gray-800 text-white border-gray-600' : 'bg-green-100 text-green-800 border-green-300'}`}>
       <MapPin className="h-4 w-4" />
       {isEditing ? (
         <div className="flex items-center space-x-1">
@@ -131,8 +131,8 @@ export function LocationDisplay({ onLocationChange }: { onLocationChange?: () =>
         </div>
       ) : (
         <div className="flex items-center space-x-1 cursor-pointer" onClick={() => setIsEditing(true)}>
-          <span className="text-sm font-medium">{location}</span>
-          <Edit2 className="h-3 w-3" />
+          <span className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-green-800'}`}>{location}</span>
+          <Edit2 className={`h-3 w-3 ${theme === 'dark' ? 'text-white' : 'text-green-800'}`} />
         </div>
       )}
     </div>
