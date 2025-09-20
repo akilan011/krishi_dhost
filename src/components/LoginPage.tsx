@@ -378,11 +378,11 @@ const LoginPage = () => {
                 <div>
                   <Label htmlFor="district" className="text-base font-semibold text-gray-700 dark:text-gray-300">
                     <MapPin className="inline mr-2 h-4 w-4 text-emerald-600" />
-                    District
+                    {t('district')}
                   </Label>
                   <Select onValueChange={(value) => handleInputChange("district", value)} value={formData.district}>
                     <SelectTrigger className="h-14 mt-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-                      <SelectValue placeholder="Select District" />
+                      <SelectValue placeholder={t('selectDistrict')} />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-2 border-gray-200 dark:border-gray-700">
                       {getDistricts(formData.state).map(([key, district]) => (
@@ -400,11 +400,11 @@ const LoginPage = () => {
                 <div>
                   <Label htmlFor="village" className="text-base font-semibold text-gray-700 dark:text-gray-300">
                     <MapPin className="inline mr-2 h-4 w-4 text-emerald-600" />
-                    Village
+                    {t('village')}
                   </Label>
                   <Select onValueChange={(value) => handleInputChange("village", value)} value={formData.village}>
                     <SelectTrigger className="h-14 mt-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-                      <SelectValue placeholder="Select Village" />
+                      <SelectValue placeholder={t('selectVillage')} />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-2 border-gray-200 dark:border-gray-700">
                       {getVillages(formData.state, formData.district).map((village) => (

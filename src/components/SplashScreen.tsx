@@ -73,7 +73,7 @@ const SplashScreen = () => {
                 onClick={() => handleLanguageSelect(lang.code)}
                 variant={language === lang.code ? "hero" : "outline"}
                 size="lg"
-                className={`text-lg font-medium py-4 px-6 ${
+                className={`text-lg font-bold py-4 px-6 ${
                   language === lang.code 
                     ? "bg-white/30 border-white/50 text-white" 
                     : "bg-white/10 border-white/20 text-white/90 hover:bg-white/20"
@@ -92,7 +92,7 @@ const SplashScreen = () => {
           <Button 
             onClick={handleTutorialVideo}
             variant="hero"
-            className="w-full shadow-2xl"
+            className="w-full shadow-2xl text-xl"
             style={{fontFamily: 'Times New Roman, serif'}}
           >
             <Play className="mr-3 h-5 w-5" />
