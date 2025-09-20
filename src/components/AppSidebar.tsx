@@ -94,7 +94,10 @@ export function AppSidebar() {
     <Sidebar className="border-r bg-gradient-field">
       <SidebarContent>
         <div className="p-4 border-b border-white/20">
-          <h2 className={`font-bold text-lg ${theme === 'light' ? 'text-black' : 'text-lime-400'}`}>{!isCollapsed && "Krishi Dost"}</h2>
+          <div className={`font-bold text-lg flex items-center gap-2 ${theme === 'light' ? 'text-black' : 'text-lime-400'}`}>
+            <img src="https://i.postimg.cc/6yzmZ930/logo.png" alt="Krishi Dost Logo" className="h-6 w-6 bg-white p-1 rounded" />
+            {!isCollapsed && "Krishi Dost"}
+          </div>
         </div>
         <SidebarGroup>
           <SidebarGroupLabel className={`font-semibold ${theme === 'light' ? 'text-black/90' : 'text-white/90'}`}>

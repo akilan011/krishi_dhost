@@ -82,7 +82,7 @@ export function LocationDisplay({ onLocationChange }: { onLocationChange?: () =>
   };
 
   return (
-    <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-800'}`}>
+    <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${theme === 'dark' ? 'bg-white text-black' : 'bg-green-100 text-green-800'}`}>
       <MapPin className="h-4 w-4" />
       {isEditing ? (
         <div className="flex items-center space-x-1">
