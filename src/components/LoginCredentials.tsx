@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { User, Lock, LogIn, ArrowLeft, UserPlus, WifiOff } from "lucide-react";
+import { User, Lock, LogIn, ArrowLeft, UserPlus, WifiOff, AlertCircle } from "lucide-react";
 import farmerHero from "@/assets/farmer-hero.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -16,25 +16,34 @@ const LoginCredentials = () => {
     username: "",
     password: ""
   });
+  const [error, setError] = useState("");
 
   const handleInputChange = (field: string, value: string) => {
     setCredentials(prev => ({ ...prev, [field]: value }));
   };
 
   const handleLogin = () => {
+    setError("");
     if (!credentials.username || !credentials.password) {
-      alert("Please enter both username and password");
+      setError("Please enter both username and password");
       return;
     }
     const savedData = localStorage.getItem("farmerData");
     if (savedData) {
       const farmerData = JSON.parse(savedData);
+      // Check if the user exists and password matches
       if (farmerData.name === credentials.username && farmerData.password === credentials.password) {
+        // Mark as logged in
+        const updatedData = { ...farmerData, isLoggedIn: true };
+        localStorage.setItem('farmerData', JSON.stringify(updatedData));
         navigate("/dashboard");
+        return;
+      } else {
+        setError("Wrong password or username. Please try again.");
         return;
       }
     }
-    navigate("/dashboard");
+    setError("No account found. Please register first.");
   };
 
   const handleRegister = () => {
@@ -83,6 +92,14 @@ const LoginCredentials = () => {
           </CardHeader>
           
           <CardContent className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-center space-x-3">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                <p className="text-red-700 dark:text-red-400 font-medium">{error}</p>
+              </div>
+            )}
+
             {/* Form Fields */}
             <div className="space-y-6">
               <div>

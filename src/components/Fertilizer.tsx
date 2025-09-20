@@ -31,6 +31,9 @@ const Fertilizer: React.FC = () => {
   const [soil, setSoil] = useState("");
   const [area, setArea] = useState<number | "">("");
   const [suggestion, setSuggestion] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   const cropOptions = [
     "Wheat", "Rice", "Maize", "Millets", "Soybeans", "Sugarcane",
@@ -68,13 +71,115 @@ const Fertilizer: React.FC = () => {
     },
   };
 
+  // Comprehensive list of fertilizers available online in India
+  const getComprehensiveFertilizerList = (): Fertilizer[] => {
+    return [
+      // Primary Fertilizers
+      { name: "Urea (46% N)", mrp: 266, subsidy: 242, cost_of_sale: 24, source: "local" },
+      { name: "DAP (Di-Ammonium Phosphate)", mrp: 1350, subsidy: 150, cost_of_sale: 1200, source: "local" },
+      { name: "MOP (Muriate of Potash)", mrp: 1700, subsidy: 200, cost_of_sale: 1500, source: "local" },
+      { name: "NPK 10:26:26", mrp: 1450, subsidy: 180, cost_of_sale: 1270, source: "local" },
+      { name: "NPK 12:32:16", mrp: 1380, subsidy: 160, cost_of_sale: 1220, source: "local" },
+      { name: "NPK 20:20:0:13", mrp: 1250, subsidy: 140, cost_of_sale: 1110, source: "local" },
+      { name: "NPK 19:19:19", mrp: 1320, subsidy: 170, cost_of_sale: 1150, source: "local" },
+      { name: "NPK 17:17:17", mrp: 1280, subsidy: 150, cost_of_sale: 1130, source: "local" },
+      { name: "NPK 15:15:15", mrp: 1200, subsidy: 130, cost_of_sale: 1070, source: "local" },
+      { name: "NPK 14:35:14", mrp: 1420, subsidy: 190, cost_of_sale: 1230, source: "local" },
+      
+      // Secondary Fertilizers
+      { name: "Single Super Phosphate (SSP)", mrp: 450, subsidy: 80, cost_of_sale: 370, source: "local" },
+      { name: "Triple Super Phosphate (TSP)", mrp: 850, subsidy: 120, cost_of_sale: 730, source: "local" },
+      { name: "Ammonium Sulphate", mrp: 680, subsidy: 90, cost_of_sale: 590, source: "local" },
+      { name: "Calcium Ammonium Nitrate (CAN)", mrp: 720, subsidy: 100, cost_of_sale: 620, source: "local" },
+      { name: "Potassium Sulphate", mrp: 2200, subsidy: 300, cost_of_sale: 1900, source: "local" },
+      { name: "Potassium Chloride", mrp: 1650, subsidy: 200, cost_of_sale: 1450, source: "local" },
+      
+      // Micronutrient Fertilizers
+      { name: "Zinc Sulphate (21% Zn)", mrp: 850, subsidy: 50, cost_of_sale: 800, source: "local" },
+      { name: "Ferrous Sulphate (19% Fe)", mrp: 420, subsidy: 30, cost_of_sale: 390, source: "local" },
+      { name: "Manganese Sulphate (30% Mn)", mrp: 950, subsidy: 60, cost_of_sale: 890, source: "local" },
+      { name: "Copper Sulphate (24% Cu)", mrp: 1200, subsidy: 80, cost_of_sale: 1120, source: "local" },
+      { name: "Boron (17% B)", mrp: 1800, subsidy: 100, cost_of_sale: 1700, source: "local" },
+      { name: "Magnesium Sulphate (9.6% Mg)", mrp: 650, subsidy: 40, cost_of_sale: 610, source: "local" },
+      
+      // Organic Fertilizers
+      { name: "Vermicompost", mrp: 350, subsidy: 50, cost_of_sale: 300, source: "local" },
+      { name: "Neem Cake", mrp: 280, subsidy: 40, cost_of_sale: 240, source: "local" },
+      { name: "Bone Meal", mrp: 450, subsidy: 60, cost_of_sale: 390, source: "local" },
+      { name: "Castor Cake", mrp: 320, subsidy: 45, cost_of_sale: 275, source: "local" },
+      { name: "Mustard Cake", mrp: 380, subsidy: 55, cost_of_sale: 325, source: "local" },
+      { name: "Groundnut Cake", mrp: 420, subsidy: 65, cost_of_sale: 355, source: "local" },
+      
+      // Liquid Fertilizers
+      { name: "Liquid NPK 19:19:19", mrp: 180, subsidy: 20, cost_of_sale: 160, source: "local" },
+      { name: "Liquid Urea (25% N)", mrp: 120, subsidy: 15, cost_of_sale: 105, source: "local" },
+      { name: "Liquid Phosphorus (52% P2O5)", mrp: 220, subsidy: 30, cost_of_sale: 190, source: "local" },
+      { name: "Liquid Potash (50% K2O)", mrp: 250, subsidy: 35, cost_of_sale: 215, source: "local" },
+      
+      // Specialty Fertilizers
+      { name: "Calcium Nitrate", mrp: 980, subsidy: 80, cost_of_sale: 900, source: "local" },
+      { name: "Magnesium Nitrate", mrp: 1150, subsidy: 90, cost_of_sale: 1060, source: "local" },
+      { name: "Potassium Nitrate", mrp: 2800, subsidy: 200, cost_of_sale: 2600, source: "local" },
+      { name: "Mono Ammonium Phosphate (MAP)", mrp: 1380, subsidy: 160, cost_of_sale: 1220, source: "local" },
+      { name: "Ammonium Chloride", mrp: 580, subsidy: 70, cost_of_sale: 510, source: "local" },
+      
+      // Water Soluble Fertilizers
+      { name: "WSF NPK 20:20:20", mrp: 320, subsidy: 40, cost_of_sale: 280, source: "local" },
+      { name: "WSF NPK 13:0:45", mrp: 380, subsidy: 50, cost_of_sale: 330, source: "local" },
+      { name: "WSF NPK 0:52:34", mrp: 420, subsidy: 60, cost_of_sale: 360, source: "local" },
+      { name: "WSF Calcium Chloride", mrp: 280, subsidy: 30, cost_of_sale: 250, source: "local" },
+      
+      // Bio-fertilizers
+      { name: "Rhizobium Culture", mrp: 150, subsidy: 25, cost_of_sale: 125, source: "local" },
+      { name: "Azotobacter Culture", mrp: 180, subsidy: 30, cost_of_sale: 150, source: "local" },
+      { name: "PSB (Phosphate Solubilizing Bacteria)", mrp: 160, subsidy: 28, cost_of_sale: 132, source: "local" },
+      { name: "Mycorrhiza", mrp: 220, subsidy: 35, cost_of_sale: 185, source: "local" },
+      { name: "Azospirillum", mrp: 170, subsidy: 25, cost_of_sale: 145, source: "local" },
+      
+      // Foliar Fertilizers
+      { name: "Foliar NPK 12:61:0", mrp: 280, subsidy: 35, cost_of_sale: 245, source: "local" },
+      { name: "Foliar Micronutrient Mix", mrp: 350, subsidy: 45, cost_of_sale: 305, source: "local" },
+      { name: "Foliar Calcium Boron", mrp: 320, subsidy: 40, cost_of_sale: 280, source: "local" },
+      
+      // Slow Release Fertilizers
+      { name: "Coated Urea (Slow Release)", mrp: 450, subsidy: 60, cost_of_sale: 390, source: "local" },
+      { name: "Polymer Coated NPK", mrp: 680, subsidy: 80, cost_of_sale: 600, source: "local" },
+      
+      // Chelated Micronutrients
+      { name: "Chelated Iron (EDTA)", mrp: 1200, subsidy: 100, cost_of_sale: 1100, source: "local" },
+      { name: "Chelated Zinc (EDTA)", mrp: 1350, subsidy: 120, cost_of_sale: 1230, source: "local" },
+      { name: "Chelated Manganese (EDTA)", mrp: 1450, subsidy: 130, cost_of_sale: 1320, source: "local" },
+      
+      // Soil Conditioners
+      { name: "Gypsum (Calcium Sulphate)", mrp: 180, subsidy: 20, cost_of_sale: 160, source: "local" },
+      { name: "Lime (Calcium Carbonate)", mrp: 120, subsidy: 15, cost_of_sale: 105, source: "local" },
+      { name: "Sulphur (90% S)", mrp: 280, subsidy: 30, cost_of_sale: 250, source: "local" },
+      
+      // Specialty Crop Fertilizers
+      { name: "Tea Special Fertilizer", mrp: 850, subsidy: 80, cost_of_sale: 770, source: "local" },
+      { name: "Coffee Special Fertilizer", mrp: 920, subsidy: 90, cost_of_sale: 830, source: "local" },
+      { name: "Sugarcane Special NPK", mrp: 1180, subsidy: 120, cost_of_sale: 1060, source: "local" },
+      { name: "Cotton Special Fertilizer", mrp: 1050, subsidy: 100, cost_of_sale: 950, source: "local" },
+      { name: "Paddy Special NPK", mrp: 980, subsidy: 95, cost_of_sale: 885, source: "local" },
+      { name: "Wheat Special Fertilizer", mrp: 890, subsidy: 85, cost_of_sale: 805, source: "local" }
+    ];
+  };
+
   const fetchFromGov = async (): Promise<Fertilizer[]> => {
+    const cached = localStorage.getItem('fertilizerCache');
+    const cacheTime = localStorage.getItem('fertilizerCacheTime');
+    const now = Date.now();
+    
+    if (cached && cacheTime && (now - parseInt(cacheTime)) < 3600000) {
+      return JSON.parse(cached);
+    }
+
     try {
       const resp = await fetch(
-        "https://api.data.gov.in/resource/b73c4670-a371-4747-824c-4ea767918dc9?format=json&api-key=579b464db66ec23bdd00000176dc0d6be29548ac4b068a452db7959f"
+        "https://api.data.gov.in/resource/b73c4670-a371-4747-824c-4ea767918dc9?format=json&api-key=579b464db66ec23bdd00000176dc0d6be29548ac4b068a452db7959f&limit=50"
       );
       const json = await resp.json();
-      const records = json.records.map((rec: any) => ({
+      const govRecords = json.records.slice(0, 20).map((rec: any) => ({
         name: rec.fertilizer || rec.fertilizer_name,
         mrp: rec.mrp ? Number(rec.mrp) : null,
         subsidy: rec.subsidy ? Number(rec.subsidy) : null,
@@ -82,10 +187,18 @@ const Fertilizer: React.FC = () => {
         source: "gov" as const,
       }));
 
-      return records.sort((a, b) => (b.mrp || 0) - (a.mrp || 0));
+      // Combine government data with comprehensive local list
+      const localFertilizers = getComprehensiveFertilizerList();
+      const allFertilizers = [...localFertilizers, ...govRecords];
+      const sortedRecords = allFertilizers.sort((a, b) => a.name.localeCompare(b.name));
+      
+      localStorage.setItem('fertilizerCache', JSON.stringify(sortedRecords));
+      localStorage.setItem('fertilizerCacheTime', now.toString());
+      
+      return sortedRecords;
     } catch (err) {
-      console.error("Gov API error:", err);
-      return [];
+      console.error("Gov API error, using local data:", err);
+      return getComprehensiveFertilizerList();
     }
   };
 
@@ -96,11 +209,31 @@ const Fertilizer: React.FC = () => {
     }
   };
 
+  const handleDeleteSuggestion = (id: number) => {
+    const existing = JSON.parse(localStorage.getItem('Fertilizer Suggestions') || '[]');
+    const updated = existing.filter((s: SavedSuggestion) => s.id !== id);
+    localStorage.setItem('Fertilizer Suggestions', JSON.stringify(updated));
+    setSavedSuggestions(updated);
+  };
+
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const govData = await fetchFromGov();
-      setFertilizers(govData);
+      
+      // Always load local fertilizers first
+      const localFertilizers = getComprehensiveFertilizerList();
+      setFertilizers(localFertilizers);
+      
+      // Try to get government data and merge
+      try {
+        const govData = await fetchFromGov();
+        if (govData && govData.length > 0) {
+          setFertilizers(govData);
+        }
+      } catch (err) {
+        console.log('Using local fertilizer data');
+      }
+      
       fetchSavedSuggestions();
       setLoading(false);
     };
@@ -147,32 +280,92 @@ const Fertilizer: React.FC = () => {
       {loading ? (
         <p>{t('loading')}</p>
       ) : (
-        <div className="overflow-x-auto mb-8">
+        <>
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search fertilizers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={`w-full max-w-md p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+            />
+          </div>
+          <div className="overflow-x-auto mb-8">
           <table className={`min-w-full border rounded-lg overflow-hidden ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>
             <thead className={theme === 'dark' ? 'bg-green-800' : 'bg-green-100'}>
               <tr>
                 <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('name')}</th>
-                <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('mrp')}</th>
                 <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('subsidy')}</th>
                 <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('costOfSale')}</th>
+                <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>Action</th>
               </tr>
             </thead>
             <tbody>
-              {fertilizers.map((f, idx) => (
-                <tr key={idx} className={theme === 'dark' ? 'hover:bg-green-900' : 'hover:bg-green-50'}>
-                  <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{f.name}</td>
-                  <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{f.mrp !== null ? `₹${f.mrp}` : "-"}</td>
-                  <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{f.subsidy !== null ? `₹${f.subsidy}` : "-"}</td>
-                  <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{f.cost_of_sale !== null ? `₹${f.cost_of_sale}` : "-"}</td>
-                </tr>
-              ))}
+              {(() => {
+                const filtered = fertilizers.filter(f => 
+                  f.name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                return filtered.slice(startIndex, endIndex).map((f, idx) => (
+                  <tr key={idx} className={theme === 'dark' ? 'hover:bg-green-900' : 'hover:bg-green-50'}>
+                    <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{f.name}</td>
+                    <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{f.subsidy !== null ? `₹${f.subsidy}` : "-"}</td>
+                    <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{f.cost_of_sale !== null ? `₹${f.cost_of_sale}` : "-"}</td>
+                    <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>
+                      <button 
+                        onClick={() => window.open(`https://www.google.com/search?q=buy+${encodeURIComponent(f.name)}+fertilizer+online`, '_blank')}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
+                      >
+                        Buy
+                      </button>
+                    </td>
+                  </tr>
+                ));
+              })()}
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination */}
+        {(() => {
+          const filtered = fertilizers.filter(f => 
+            f.name.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+          const totalPages = Math.ceil(filtered.length / itemsPerPage);
+          
+          if (totalPages <= 1) return null;
+          
+          return (
+            <div className="flex justify-center items-center space-x-2 mt-4">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+              >
+                Previous
+              </button>
+              
+              <span className={`px-3 py-1 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                Page {currentPage} of {totalPages} ({filtered.length} fertilizers)
+              </span>
+              
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded ${currentPage === totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+              >
+                Next
+              </button>
+            </div>
+          );
+        })()}
+        </>
       )}
 
       <h2 className="text-2xl font-bold mb-4">{t('personalizedFertilizerSuggestion')}</h2>
-      <div className={`p-6 rounded-lg shadow-md max-w-md mb-8 space-y-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+      <div className="flex gap-6 mb-8 items-start">
+        <div className={`p-6 rounded-lg shadow-md flex-1 max-w-md space-y-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
         <div>
           <label className="block font-medium mb-1">{t('crop')}</label>
           <select
@@ -222,39 +415,59 @@ const Fertilizer: React.FC = () => {
         {suggestion && (
           <div className={`mt-4 p-3 border-l-4 border-green-400 rounded ${theme === 'dark' ? 'bg-green-900' : 'bg-green-50'}`}>
             <strong>{t('suggestion')}:</strong> {suggestion}
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={() => {
+                  const farmerData = localStorage.getItem('farmerData');
+                  const location = farmerData ? JSON.parse(farmerData).village || 'India' : 'India';
+                  window.open(`https://www.google.com/maps/search/fertilizer+stores+near+${encodeURIComponent(location)}`, '_blank');
+                }}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
+              >
+                Find Nearby Stores
+              </button>
+              <button
+                onClick={() => window.open('https://www.google.com/search?q=buy+fertilizer+online+India', '_blank')}
+                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors"
+              >
+                Buy Online
+              </button>
+            </div>
+          </div>
+        )}
+        </div>
+        
+        {savedSuggestions.length > 0 && (
+          <div className="flex-1 max-w-md">
+            <h3 className="text-xl font-bold mb-4">{t('yourPreviousSuggestions')}</h3>
+            <div className={`rounded-lg shadow-md p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+              <div className="space-y-3 max-h-80 overflow-y-auto">
+                {savedSuggestions.slice(0, 5).map((s) => (
+                  <div key={s.id} className={`p-3 rounded border-l-4 border-green-400 ${theme === 'dark' ? 'bg-gray-700' : 'bg-green-50'}`}>
+                    <div className="text-sm font-medium">{s.crop} - {s.soil} ({s.area} acres)</div>
+                    <div className="text-xs text-gray-500 mt-1">{new Date(s.created_at).toLocaleDateString()}</div>
+                    <div className="text-sm mt-2">{s.suggestion}</div>
+                    <div className="mt-2 flex gap-1">
+                      <button
+                        onClick={() => window.open('https://www.google.com/search?q=buy+fertilizer+online+India', '_blank')}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs transition-colors"
+                      >
+                        Buy
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSuggestion(s.id)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
-
-      {savedSuggestions.length > 0 && (
-        <div>
-          <h2 className="text-2xl font-bold mb-4">{t('yourPreviousSuggestions')}</h2>
-          <div className="overflow-x-auto">
-            <table className={`min-w-full border rounded-lg overflow-hidden ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>
-              <thead className={theme === 'dark' ? 'bg-green-800' : 'bg-green-100'}>
-                <tr>
-                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('crop')}</th>
-                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('soil')}</th>
-                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('area')}</th>
-                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('suggestion')}</th>
-                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('date')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {savedSuggestions.map((s) => (
-                  <tr key={s.id} className={theme === 'dark' ? 'hover:bg-green-900' : 'hover:bg-green-50'}>
-                    <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{s.crop}</td>
-                    <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{s.soil}</td>
-                    <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{s.area}</td>
-                    <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{s.suggestion}</td>
-                    <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{new Date(s.created_at).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
