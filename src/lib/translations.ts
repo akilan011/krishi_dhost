@@ -113,6 +113,8 @@ export const extendedTranslations = {
     'fertilizer': 'उर्वरक',
     'pestControl': 'कीट नियंत्रण',
     'harvesting': 'कटाई',
+    'fertilizerSuggestions': 'उर्वरक सुझाव प्राप्त करें',
+    'analyzeImage': 'विश्लेषण करें'
   }
 };
 

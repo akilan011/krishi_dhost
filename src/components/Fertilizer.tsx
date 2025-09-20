@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Fertilizer {
   name: string;
@@ -20,6 +21,7 @@ interface SavedSuggestion {
 
 const Fertilizer: React.FC = () => {
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const [fertilizers, setFertilizers] = useState<Fertilizer[]>([]);
   const [loading, setLoading] = useState(true);
   const [savedSuggestions, setSavedSuggestions] = useState<SavedSuggestion[]>([]);
@@ -88,7 +90,7 @@ const Fertilizer: React.FC = () => {
   };
 
   const fetchSavedSuggestions = () => {
-    const saved = localStorage.getItem('fertilizerSuggestions');
+    const saved = localStorage.getItem('Fertilizer Suggestions');
     if (saved) {
       setSavedSuggestions(JSON.parse(saved));
     }
@@ -133,26 +135,26 @@ const Fertilizer: React.FC = () => {
       created_at: new Date().toISOString()
     };
     
-    const existing = JSON.parse(localStorage.getItem('fertilizerSuggestions') || '[]');
+    const existing = JSON.parse(localStorage.getItem('Fertilizer Suggestions') || '[]');
     existing.unshift(newSuggestion);
-    localStorage.setItem('fertilizerSuggestions', JSON.stringify(existing));
+    localStorage.setItem('Fertilizer Suggestions', JSON.stringify(existing));
     fetchSavedSuggestions();
   };
 
   return (
     <div className={`p-6 max-w-5xl mx-auto ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
-      <h2 className="text-2xl font-bold mb-4">Fertilizer Prices (Govt Data)</h2>
+      <h2 className="text-2xl font-bold mb-4">{t('fertilizerPrices')}</h2>
       {loading ? (
-        <p>Loading fertilizers...</p>
+        <p>{t('loading')}</p>
       ) : (
         <div className="overflow-x-auto mb-8">
           <table className={`min-w-full border rounded-lg overflow-hidden ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>
             <thead className={theme === 'dark' ? 'bg-green-800' : 'bg-green-100'}>
               <tr>
-                <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>Name</th>
-                <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>MRP</th>
-                <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>Subsidy</th>
-                <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>Cost of Sale</th>
+                <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('name')}</th>
+                <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('mrp')}</th>
+                <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('subsidy')}</th>
+                <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('costOfSale')}</th>
               </tr>
             </thead>
             <tbody>
@@ -169,16 +171,16 @@ const Fertilizer: React.FC = () => {
         </div>
       )}
 
-      <h2 className="text-2xl font-bold mb-4">Personalized Fertilizer Suggestion</h2>
+      <h2 className="text-2xl font-bold mb-4">{t('personalizedFertilizerSuggestion')}</h2>
       <div className={`p-6 rounded-lg shadow-md max-w-md mb-8 space-y-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
         <div>
-          <label className="block font-medium mb-1">Crop</label>
+          <label className="block font-medium mb-1">{t('crop')}</label>
           <select
             className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
             value={crop}
             onChange={(e) => setCrop(e.target.value)}
           >
-            <option value="">Select Crop</option>
+            <option value="">{t('selectCrop')}</option>
             {cropOptions.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
@@ -186,13 +188,13 @@ const Fertilizer: React.FC = () => {
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Soil Type</label>
+          <label className="block font-medium mb-1">{t('soilType')}</label>
           <select
             className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
             value={soil}
             onChange={(e) => setSoil(e.target.value)}
           >
-            <option value="">Select Soil</option>
+            <option value="">{t('selectSoil')}</option>
             {soilOptions.map((s) => (
               <option key={s} value={s}>{s}</option>
             ))}
@@ -200,13 +202,13 @@ const Fertilizer: React.FC = () => {
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Area (acres)</label>
+          <label className="block font-medium mb-1">{t('areaAcres')}</label>
           <input
             type="number"
             className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
             value={area}
             onChange={(e) => setArea(Number(e.target.value))}
-            placeholder="e.g. 2"
+            placeholder={t('areaPlaceholder')}
           />
         </div>
 
@@ -214,28 +216,28 @@ const Fertilizer: React.FC = () => {
           onClick={handleSuggest}
           className="w-full bg-green-500 text-white font-bold py-2 rounded-md hover:bg-green-600 transition-colors"
         >
-          Get Suggestion
+          {t('getSuggestion')}
         </button>
 
         {suggestion && (
           <div className={`mt-4 p-3 border-l-4 border-green-400 rounded ${theme === 'dark' ? 'bg-green-900' : 'bg-green-50'}`}>
-            <strong>Suggestion:</strong> {suggestion}
+            <strong>{t('suggestion')}:</strong> {suggestion}
           </div>
         )}
       </div>
 
       {savedSuggestions.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold mb-4">Your Previous Suggestions</h2>
+          <h2 className="text-2xl font-bold mb-4">{t('yourPreviousSuggestions')}</h2>
           <div className="overflow-x-auto">
             <table className={`min-w-full border rounded-lg overflow-hidden ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>
               <thead className={theme === 'dark' ? 'bg-green-800' : 'bg-green-100'}>
                 <tr>
-                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>Crop</th>
-                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>Soil</th>
-                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>Area</th>
-                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>Suggestion</th>
-                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>Date</th>
+                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('crop')}</th>
+                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('soil')}</th>
+                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('area')}</th>
+                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('suggestion')}</th>
+                  <th className={`p-3 text-left border-b ${theme === 'dark' ? 'text-white border-gray-600' : 'border-gray-300'}`}>{t('date')}</th>
                 </tr>
               </thead>
               <tbody>
