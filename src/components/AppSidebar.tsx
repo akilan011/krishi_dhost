@@ -75,18 +75,18 @@ export function AppSidebar() {
       color: "hsl(51, 100%, 50%)" // Gold
     },
     {
-      titleKey: "expertHelp",
-      url: "/dashboard/expert-help",
-      icon: UserCheck,
-      descriptionKey: "getExpertAdvice",
-      color: "hsl(353, 66%, 47%)" // Crimson Red
-    },
-    {
       titleKey: "cameraDetection",
       url: "/dashboard/camera-detection",
       icon: Camera,
       descriptionKey: "identifyCropDiseases",
       color: "hsl(207, 89%, 67%)" // Sky Blue
+    },
+    {
+      titleKey: "expertHelp",
+      url: "/dashboard/expert-help",
+      icon: UserCheck,
+      descriptionKey: "getExpertAdvice",
+      color: "hsl(353, 66%, 47%)" // Crimson Red
     },
   ];
 

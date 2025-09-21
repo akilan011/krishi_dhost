@@ -5,6 +5,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { LocationDisplay } from "@/components/LocationDisplay";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { UserProfile } from "@/components/UserProfile";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -49,6 +50,7 @@ const Dashboard = () => {
                 const data = localStorage.getItem('farmerData');
                 if (data) setFarmerData(JSON.parse(data));
               }} />
+              <LanguageSelector />
               <ThemeToggle />
               <UserProfile />
             </div>
