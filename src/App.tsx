@@ -22,6 +22,8 @@ import AICropCalendar from "./components/AICropCalendar";
 import LocationPage from "./components/LocationPage";
 import Fertilizer from "./components/Fertilizer";
 import SoilType from "./components/SoilType";
+import FeedBackPage from "./components/FeedBackPage";
+import FeedbackAdmin from "./components/FeedbackAdmin";
 import NotFound from "./pages/NotFound";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -49,7 +51,7 @@ const App = () => (
             <Route path="/login" element={<LoginCredentials />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/crop-selection" element={<CropSelection />} />
-            <Route path="/dashboard" element={<Dashboard />}>
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
               <Route index element={<DashboardHome />} />
               <Route path="my-crop" element={<MyCrop />} />
               <Route path="ai-crop-calendar" element={<AICropCalendar />} />
@@ -59,6 +61,8 @@ const App = () => (
               <Route path="camera-detection" element={<CameraDetection />} />
               <Route path="fertilizer" element={<Fertilizer />} />
               <Route path="soil-type" element={<SoilType />} />
+              <Route path="feedback" element={<FeedBackPage />} />
+              <Route path="feedback-admin" element={<FeedbackAdmin />} />
               <Route path="location" element={<LocationPage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

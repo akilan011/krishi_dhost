@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Wheat, TrendingUp, Building, UserCheck, Home, Camera, Calendar, MapPin, Sprout, Mountain } from "lucide-react";
+import { Wheat, TrendingUp, Building, UserCheck, Home, Camera, Calendar, MapPin, Sprout, Mountain, MessageSquare } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -87,6 +87,13 @@ export function AppSidebar() {
       icon: UserCheck,
       descriptionKey: "getExpertAdvice",
       color: "hsl(353, 66%, 47%)" // Crimson Red
+    },
+    {
+      titleKey: "feedback",
+      url: "/dashboard/feedback",
+      icon: MessageSquare,
+      descriptionKey: "shareYourFeedback",
+      color: "hsl(280, 100%, 70%)" // Purple
     },
   ];
 

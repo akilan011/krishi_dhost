@@ -167,6 +167,10 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     // Sidebar
     'fertilizer': 'Fertilizer',
     'fertilizerSuggestions': 'Get fertilizer recommendations',
+    'feedback': 'Feedback',
+    'shareYourFeedback': 'Share your feedback',
+    'feedbackAdmin': 'Feedback Admin',
+    'manageFeedback': 'Manage feedback submissions',
     
     // Additional common translations
     'soil': 'Soil',
@@ -270,6 +274,10 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     // Sidebar
     'fertilizer': 'उर्वरक',
     'fertilizerSuggestions': 'उर्वरक सुझाव प्राप्त करें',
+    'feedback': 'फीडबैक',
+    'shareYourFeedback': 'अपना फीडबैक साझा करें',
+    'feedbackAdmin': 'फीडबैक एडमिन',
+    'manageFeedback': 'फीडबैक सबमिशन प्रबंधित करें',
     
     // Additional common translations
     'soil': 'मिट्टी',
