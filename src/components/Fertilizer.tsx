@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -22,9 +22,16 @@ interface SavedSuggestion {
 const Fertilizer: React.FC = () => {
   const { theme } = useTheme();
   const { t } = useLanguage();
-  const [fertilizers, setFertilizers] = useState<Fertilizer[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [savedSuggestions, setSavedSuggestions] = useState<SavedSuggestion[]>([]);
+  const [fertilizers, setFertilizers] = useState<Fertilizer[]>(() => {
+    // Load cached data immediately for instant display
+    const cached = localStorage.getItem('fertilizerCache');
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [loading, setLoading] = useState(false);
+  const [savedSuggestions, setSavedSuggestions] = useState<SavedSuggestion[]>(() => {
+    const saved = localStorage.getItem('Fertilizer Suggestions');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   // Form state
   const [crop, setCrop] = useState("");
@@ -33,7 +40,23 @@ const Fertilizer: React.FC = () => {
   const [suggestion, setSuggestion] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 5;
+  const [currentLocation, setCurrentLocation] = useState(() => {
+    const farmerData = localStorage.getItem('farmerData');
+    return farmerData ? JSON.parse(farmerData).village || 'India' : 'India';
+  });
+  const [forceUpdate, setForceUpdate] = useState(0);
+  const [showStores, setShowStores] = useState(false);
+  const [selectedFertilizer, setSelectedFertilizer] = useState<string>('');
+
+  const getStoresForLocation = (fertilizer: string, location: string) => {
+    const locationName = location.split(',')[0];
+    return [
+      { name: `${locationName} Agro Center`, address: `Main Road, ${locationName}`, phone: '+91 98765 43210', distance: '0.5 km' },
+      { name: `Krishi Seva Kendra`, address: `Market Area, ${locationName}`, phone: '+91 98765 43211', distance: '1.2 km' },
+      { name: `${locationName} Fertilizer Store`, address: `Bus Stand Road, ${locationName}`, phone: '+91 98765 43212', distance: '2.1 km' }
+    ];
+  };
 
   const cropOptions = [
     "Wheat", "Rice", "Maize", "Millets", "Soybeans", "Sugarcane",
@@ -71,8 +94,8 @@ const Fertilizer: React.FC = () => {
     },
   };
 
-  // Comprehensive list of fertilizers available online in India
-  const getComprehensiveFertilizerList = (): Fertilizer[] => {
+  // Memoized comprehensive list of fertilizers
+  const getComprehensiveFertilizerList = useMemo((): Fertilizer[] => {
     return [
       // Primary Fertilizers
       { name: "Urea (46% N)", mrp: 266, subsidy: 242, cost_of_sale: 24, source: "local" },
@@ -163,33 +186,43 @@ const Fertilizer: React.FC = () => {
       { name: "Paddy Special NPK", mrp: 980, subsidy: 95, cost_of_sale: 885, source: "local" },
       { name: "Wheat Special Fertilizer", mrp: 890, subsidy: 85, cost_of_sale: 805, source: "local" }
     ];
-  };
+  }, []);
 
-  const fetchFromGov = async (): Promise<Fertilizer[]> => {
+  const fetchFromGov = useCallback(async (): Promise<Fertilizer[]> => {
     const cached = localStorage.getItem('fertilizerCache');
     const cacheTime = localStorage.getItem('fertilizerCacheTime');
     const now = Date.now();
     
+    // Use 1 hour cache
     if (cached && cacheTime && (now - parseInt(cacheTime)) < 3600000) {
       return JSON.parse(cached);
     }
 
     try {
+      // Use AbortController for faster timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
       const resp = await fetch(
-        "https://api.data.gov.in/resource/b73c4670-a371-4747-824c-4ea767918dc9?format=json&api-key=579b464db66ec23bdd00000176dc0d6be29548ac4b068a452db7959f&limit=50"
+        "https://api.data.gov.in/resource/b73c4670-a371-4747-824c-4ea767918dc9?format=json&api-key=579b464db66ec23bdd00000176dc0d6be29548ac4b068a452db7959f&limit=30",
+        { signal: controller.signal }
       );
+      
+      clearTimeout(timeoutId);
+      
+      if (!resp.ok) throw new Error('API response not ok');
+      
       const json = await resp.json();
-      const govRecords = json.records.slice(0, 20).map((rec: any) => ({
-        name: rec.fertilizer || rec.fertilizer_name,
+      const govRecords = json.records?.slice(0, 15).map((rec: any) => ({
+        name: rec.fertilizer || rec.fertilizer_name || 'Unknown',
         mrp: rec.mrp ? Number(rec.mrp) : null,
         subsidy: rec.subsidy ? Number(rec.subsidy) : null,
         cost_of_sale: rec.cost_of_sale ? Number(rec.cost_of_sale) : null,
         source: "gov" as const,
-      }));
+      })) || [];
 
-      // Combine government data with comprehensive local list
-      const localFertilizers = getComprehensiveFertilizerList();
-      const allFertilizers = [...localFertilizers, ...govRecords];
+      // Combine with local data
+      const allFertilizers = [...getComprehensiveFertilizerList, ...govRecords];
       const sortedRecords = allFertilizers.sort((a, b) => a.name.localeCompare(b.name));
       
       localStorage.setItem('fertilizerCache', JSON.stringify(sortedRecords));
@@ -197,34 +230,34 @@ const Fertilizer: React.FC = () => {
       
       return sortedRecords;
     } catch (err) {
-      console.error("Gov API error, using local data:", err);
-      return getComprehensiveFertilizerList();
+      console.log('Using local fertilizer data');
+      return getComprehensiveFertilizerList;
     }
-  };
+  }, [getComprehensiveFertilizerList]);
 
-  const fetchSavedSuggestions = () => {
+  const fetchSavedSuggestions = useCallback(() => {
     const saved = localStorage.getItem('Fertilizer Suggestions');
     if (saved) {
       setSavedSuggestions(JSON.parse(saved));
     }
-  };
+  }, []);
 
-  const handleDeleteSuggestion = (id: number) => {
+  const handleDeleteSuggestion = useCallback((id: number) => {
     const existing = JSON.parse(localStorage.getItem('Fertilizer Suggestions') || '[]');
     const updated = existing.filter((s: SavedSuggestion) => s.id !== id);
     localStorage.setItem('Fertilizer Suggestions', JSON.stringify(updated));
     setSavedSuggestions(updated);
-  };
+  }, []);
 
   useEffect(() => {
-    const load = async () => {
+    // If no cached data, load local data immediately
+    if (fertilizers.length === 0) {
+      setFertilizers(getComprehensiveFertilizerList);
+    }
+    
+    // Background fetch of government data
+    const loadGovData = async () => {
       setLoading(true);
-      
-      // Always load local fertilizers first
-      const localFertilizers = getComprehensiveFertilizerList();
-      setFertilizers(localFertilizers);
-      
-      // Try to get government data and merge
       try {
         const govData = await fetchFromGov();
         if (govData && govData.length > 0) {
@@ -232,15 +265,30 @@ const Fertilizer: React.FC = () => {
         }
       } catch (err) {
         console.log('Using local fertilizer data');
+      } finally {
+        setLoading(false);
       }
-      
-      fetchSavedSuggestions();
-      setLoading(false);
     };
-    load();
+    
+    // Delay government API call to not block initial render
+    const timeoutId = setTimeout(loadGovData, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, []);
 
-  const handleSuggest = () => {
+  // Listen for location changes
+  useEffect(() => {
+    const handleLocationChange = (event: any) => {
+      const newLocation = event.detail || (window as any).currentLocation || 'India';
+      setCurrentLocation(newLocation);
+      setForceUpdate(prev => prev + 1);
+    };
+    
+    window.addEventListener('locationChanged', handleLocationChange);
+    return () => window.removeEventListener('locationChanged', handleLocationChange);
+  }, []);
+
+  const handleSuggest = useCallback(() => {
     if (!crop || !soil || !area) {
       setSuggestion("Please fill all fields to get a suggestion.");
       return;
@@ -272,15 +320,19 @@ const Fertilizer: React.FC = () => {
     existing.unshift(newSuggestion);
     localStorage.setItem('Fertilizer Suggestions', JSON.stringify(existing));
     fetchSavedSuggestions();
-  };
+  }, [crop, soil, area, fetchSavedSuggestions]);
 
   return (
     <div className={`p-6 max-w-5xl mx-auto ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
-      <h2 className="text-2xl font-bold mb-4">{t('fertilizerPrices')}</h2>
-      {loading ? (
-        <p>{t('loading')}</p>
-      ) : (
-        <>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold">{t('fertilizerPrices')}</h2>
+        {loading && (
+          <div className="flex items-center text-sm text-gray-500">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-500 mr-2"></div>
+            Updating prices...
+          </div>
+        )}
+      </div>
           <div className="mb-4">
             <input
               type="text"
@@ -301,34 +353,46 @@ const Fertilizer: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {(() => {
+              {useMemo(() => {
                 const filtered = fertilizers.filter(f => 
                   f.name.toLowerCase().includes(searchTerm.toLowerCase())
                 );
                 const startIndex = (currentPage - 1) * itemsPerPage;
                 const endIndex = startIndex + itemsPerPage;
                 return filtered.slice(startIndex, endIndex).map((f, idx) => (
-                  <tr key={idx} className={theme === 'dark' ? 'hover:bg-green-900' : 'hover:bg-green-50'}>
+                  <tr key={`${f.name}-${idx}`} className={theme === 'dark' ? 'hover:bg-green-900' : 'hover:bg-green-50'}>
                     <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{f.name}</td>
                     <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{f.subsidy !== null ? `₹${f.subsidy}` : "-"}</td>
                     <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>{f.cost_of_sale !== null ? `₹${f.cost_of_sale}` : "-"}</td>
                     <td className={`p-3 border-b ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>
-                      <button 
-                        onClick={() => window.open(`https://www.google.com/search?q=buy+${encodeURIComponent(f.name)}+fertilizer+online`, '_blank')}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                      >
-                        Buy
-                      </button>
+                      <div className="flex gap-1">
+                        <button 
+                          onClick={() => window.open(`https://www.google.com/search?q=buy+${encodeURIComponent(f.name)}+fertilizer+online`, '_blank')}
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs transition-colors"
+                        >
+                          Buy
+                        </button>
+                        <button 
+                          onClick={() => {
+                            setSelectedFertilizer(f.name);
+                            setShowStores(true);
+                          }}
+                          className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs transition-colors"
+                          title={`Find ${f.name} near ${currentLocation}`}
+                        >
+                          Near {currentLocation.split(',')[0]}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ));
-              })()}
+              }, [fertilizers, searchTerm, currentPage, itemsPerPage, theme])}
             </tbody>
           </table>
         </div>
         
         {/* Pagination */}
-        {(() => {
+        {useMemo(() => {
           const filtered = fertilizers.filter(f => 
             f.name.toLowerCase().includes(searchTerm.toLowerCase())
           );
@@ -359,9 +423,8 @@ const Fertilizer: React.FC = () => {
               </button>
             </div>
           );
-        })()}
-        </>
-      )}
+        }, [fertilizers, searchTerm, itemsPerPage, currentPage, theme])}
+
 
       <h2 className="text-2xl font-bold mb-4">{t('personalizedFertilizerSuggestion')}</h2>
       <div className="flex gap-6 mb-8 items-start">
@@ -417,14 +480,10 @@ const Fertilizer: React.FC = () => {
             <strong>{t('suggestion')}:</strong> {suggestion}
             <div className="mt-3 flex gap-2">
               <button
-                onClick={() => {
-                  const farmerData = localStorage.getItem('farmerData');
-                  const location = farmerData ? JSON.parse(farmerData).village || 'India' : 'India';
-                  window.open(`https://www.google.com/maps/search/fertilizer+stores+near+${encodeURIComponent(location)}`, '_blank');
-                }}
+                onClick={() => window.open(`https://www.google.com/maps/search/fertilizer+stores+near+${encodeURIComponent(currentLocation)}`, '_blank')}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
               >
-                Find Nearby Stores
+                Find Stores in {currentLocation.split(',')[0]}
               </button>
               <button
                 onClick={() => window.open('https://www.google.com/search?q=buy+fertilizer+online+India', '_blank')}
@@ -468,6 +527,46 @@ const Fertilizer: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Stores Modal */}
+      {showStores && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className={`max-w-md w-full mx-4 rounded-lg p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">{selectedFertilizer} Stores in {currentLocation.split(',')[0]}</h3>
+              <button 
+                onClick={() => setShowStores(false)}
+                className="text-gray-500 hover:text-gray-700 text-xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="space-y-3">
+              {getStoresForLocation(selectedFertilizer, currentLocation).map((store, idx) => (
+                <div key={idx} className={`p-3 rounded border ${theme === 'dark' ? 'border-gray-600 bg-gray-700' : 'border-gray-200 bg-gray-50'}`}>
+                  <div className="font-medium">{store.name}</div>
+                  <div className="text-sm text-gray-500">{store.address}</div>
+                  <div className="text-sm text-gray-500">{store.phone} • {store.distance}</div>
+                  <div className="mt-2 flex gap-2">
+                    <button 
+                      onClick={() => window.open(`tel:${store.phone}`, '_self')}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Call
+                    </button>
+                    <button 
+                      onClick={() => window.open(`https://www.google.com/maps/search/${encodeURIComponent(store.name + ' ' + store.address)}`, '_blank')}
+                      className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Directions
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Wheat, TrendingUp, Building, UserCheck, Home, Camera, Calendar, MapPin, Sprout } from "lucide-react";
+import { Wheat, TrendingUp, Building, UserCheck, Home, Camera, Calendar, MapPin, Sprout, Mountain } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -52,6 +52,13 @@ export function AppSidebar() {
       icon: Sprout,
       descriptionKey: "fertilizerSuggestions",
       color: "hsl(150, 70%, 40%)" // Fresh Green
+    },
+    {
+      titleKey: "soilType",
+      url: "/dashboard/soil-type",
+      icon: Mountain,
+      descriptionKey: "analyzeSoilProperties",
+      color: "hsl(30, 60%, 45%)" // Brown
     },
     {
       titleKey: "marketPrice",

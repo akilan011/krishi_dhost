@@ -72,6 +72,12 @@ export function LocationDisplay({ onLocationChange }: { onLocationChange?: () =>
     }
     setIsEditing(false);
     onLocationChange?.();
+    // Set global location for immediate access
+    (window as any).currentLocation = newLocation;
+    // Dispatch event with force update
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('locationChanged', { detail: newLocation }));
+    }, 0);
   };
 
   const handleCancel = () => {

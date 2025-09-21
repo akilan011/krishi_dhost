@@ -106,6 +106,8 @@ const CameraDetection = () => {
         <p className="text-muted-foreground">{t('takePhotoIdentify')}</p>
       </div>
 
+
+
       {/* Upload Section */}
       <Card>
         <CardHeader>
