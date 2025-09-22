@@ -176,6 +176,74 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'soil': 'Soil',
     'date': 'Date',
     'area': 'Area',
+    'liveAlerts': 'Live Alerts',
+    'reminders': 'Reminders',
+    'todayActivities': 'Today\'s Activities',
+    'smartTips': 'Smart Tips',
+    'noActiveAlerts': 'No Active Alerts',
+    'addCropsToSeeAlerts': 'Add crops to see alerts',
+    'loginToKrishiDost': 'Login to Krishi Dost',
+    'usernameLabel': 'Username',
+    'enterName': 'Enter your name',
+    'manageCrops': 'Manage your crops',
+    'addCrop': 'Add Crop',
+    'addNewCrop': 'Add New Crop',
+    'cropName': 'Crop Name',
+    'variety': 'Variety',
+    'plantedDate': 'Planted Date',
+    'expectedHarvest': 'Expected Harvest',
+    'autoCalculated': 'Auto Calculated',
+    'harvestDateAutoCalculated': 'Harvest date is auto-calculated based on crop type',
+    'status': 'Status',
+    'selectCategory': 'Select Category',
+    'growing': 'Growing',
+    'flowering': 'Flowering',
+    'harvesting': 'Harvesting',
+    'harvested': 'Harvested',
+    'edit': 'Edit',
+    'delete': 'Delete',
+    'noCropsFound': 'No Crops Found',
+    'addCropsToSeeCalendar': 'Add crops to see calendar',
+    'addYourFirstCrop': 'Add Your First Crop',
+    'smartRemindersSchedule': 'Smart reminders and schedule',
+    'germination': 'Germination',
+    'vegetativeGrowth': 'Vegetative Growth',
+    'maturation': 'Maturation',
+    'irrigationReminder': 'Irrigation Reminder',
+    'waterRiceCrop': 'Water your rice crop',
+    'pestAlert': 'Pest Alert',
+    'brownPlanthopper': 'Brown planthopper detected',
+    'fertilizerSchedule': 'Fertilizer Schedule',
+    'applyUreaFertilizer': 'Apply urea fertilizer',
+    'harvestPreparation': 'Harvest Preparation',
+    'prepareHarvestTools': 'Prepare harvest tools',
+    'irrigationSchedule': 'Irrigation Schedule',
+    'weeklyIrrigation': 'Weekly irrigation needed',
+    'fertilizerApplication': 'Fertilizer Application',
+    'applyNPKFertilizer': 'Apply NPK fertilizer',
+    'pestInspection': 'Pest Inspection',
+    'checkPestDamage': 'Check for pest damage',
+    'noActivitiesScheduled': 'No activities scheduled',
+    'weatherBasedIrrigation': 'Weather Based Irrigation',
+    'adjustIrrigationWeather': 'Adjust irrigation based on weather',
+    'nutrientManagement': 'Nutrient Management',
+    'soilTestRecommended': 'Soil test recommended',
+    'marketTiming': 'Market Timing',
+    'planHarvestMarketPrices': 'Plan harvest based on market prices',
+    'morningIrrigation': 'Morning Irrigation',
+    'checkSoilMoisture': 'Check soil moisture levels',
+    'pestMonitoring': 'Pest Monitoring',
+    'inspectLeafDamage': 'Inspect for leaf damage',
+    'marketPriceAlert': 'Market Price Alert',
+    'priority': 'Priority',
+    'high': 'High',
+    'moderate': 'Moderate',
+    'low': 'Low',
+    'urgent': 'Urgent',
+    'week': 'Week',
+    'cropCalendar': 'Crop Calendar',
+    'selectState': 'Select State',
+    'state': 'State'
   },
   
   hi: {
@@ -283,6 +351,12 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'soil': 'मिट्टी',
     'date': 'तारीख',
     'area': 'क्षेत्र',
+    'liveAlerts': 'लाइव अलर्ट',
+    'reminders': 'रिमाइंडर',
+    'todayActivities': 'आज की गतिविधियां',
+    'smartTips': 'स्मार्ट टिप्स',
+    'noActiveAlerts': 'कोई सक्रिय अलर्ट नहीं',
+    'addCropsToSeeAlerts': 'अलर्ट देखने के लिए फसल जोड़ें'
   },
   
   ta: {
@@ -386,6 +460,10 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'soil': 'மண்',
     'date': 'தேதி',
     'area': 'பரப்பளவு',
+    'liveAlerts': 'நேரடி எச்சரிக்கைகள்',
+    'reminders': 'நினைவூட்டல்கள்',
+    'todayActivities': 'இன்றைய செயல்பாடுகள்',
+    'smartTips': 'ஸ்மார்ட் குறிப்புகள்'
   },
   
   te: {
@@ -489,6 +567,10 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'soil': 'మట్టి',
     'date': 'తేదీ',
     'area': 'వైశాల్యం',
+    'liveAlerts': 'లైవ్ అలర్ట్స్',
+    'reminders': 'రిమైండర్లు',
+    'todayActivities': 'నేటి కార్యకలాపాలు',
+    'smartTips': 'స్మార్ట్ టిప్స్'
   },
   
   pa: {
@@ -592,6 +674,10 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'soil': 'ਮਿੱਟੀ',
     'date': 'ਤਾਰੀਖ',
     'area': 'ਖੇਤਰ',
+    'liveAlerts': 'ਲਾਈਵ ਅਲਰਟ',
+    'reminders': 'ਯਾਦ ਦਿਲਾਉਣੇ',
+    'todayActivities': 'ਅੱਜ ਦੀਆਂ ਗਤੀਵਿਧੀਆਂ',
+    'smartTips': 'ਸਮਾਰਟ ਟਿਪਸ'
   },
   
   ur: {
@@ -695,6 +781,10 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'soil': 'مٹی',
     'date': 'تاریخ',
     'area': 'رقبہ',
+    'liveAlerts': 'لائیو الرٹس',
+    'reminders': 'یاد دہانیاں',
+    'todayActivities': 'آج کی سرگرمیاں',
+    'smartTips': 'سمارٹ ٹپس'
   },
   
   ml: {
@@ -798,5 +888,9 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'soil': 'മണ്ണ്',
     'date': 'തീയതി',
     'area': 'വിസ്തീർണ്ണം',
+    'liveAlerts': 'ലൈവ് അലർട്ടുകൾ',
+    'reminders': 'ഓർമ്മപ്പെടുത്തലുകൾ',
+    'todayActivities': 'ഇന്നത്തെ പ്രവർത്തനങ്ങൾ',
+    'smartTips': 'സ്മാർട്ട് ടിപ്പുകൾ'
   }
 };
