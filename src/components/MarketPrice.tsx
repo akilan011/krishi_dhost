@@ -6,10 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TrendingUp, TrendingDown, Search, MapPin, Calendar, Bell, RefreshCw, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "@/hooks/use-toast";
 
 const MarketPrice = () => {
   const { t } = useLanguage();
+  const { theme } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   
@@ -227,9 +229,9 @@ const MarketPrice = () => {
       </div>
 
       {/* API Integration Form */}
-      <Card className="border-green-200 bg-green-50">
+      <Card className={`border-green-200 ${theme === 'dark' ? 'bg-gray-800' : 'bg-green-50'}`}>
         <CardHeader>
-          <CardTitle className="flex items-center text-green-800">
+          <CardTitle className={`flex items-center ${theme === 'dark' ? 'text-green-400' : 'text-green-800'}`}>
             <RefreshCw className={`mr-2 h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
             Live Mandi Prices from Data.gov.in
           </CardTitle>
@@ -237,11 +239,11 @@ const MarketPrice = () => {
         <CardContent>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-green-900 mb-2">
+              <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-green-300' : 'text-green-900'} mb-2`}>
                 Select Commodity
               </label>
               <Select value={selectedCommodity} onValueChange={setSelectedCommodity}>
-                <SelectTrigger className="bg-white">
+                <SelectTrigger className={theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white'}>
                   <SelectValue placeholder="Choose commodity" />
                 </SelectTrigger>
                 <SelectContent>
@@ -255,11 +257,11 @@ const MarketPrice = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-green-900 mb-2">
+              <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-green-300' : 'text-green-900'} mb-2`}>
                 Select State
               </label>
               <Select value={selectedState} onValueChange={setSelectedState}>
-                <SelectTrigger className="bg-white">
+                <SelectTrigger className={theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white'}>
                   <SelectValue placeholder="Choose state" />
                 </SelectTrigger>
                 <SelectContent>
@@ -273,7 +275,7 @@ const MarketPrice = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-green-900 mb-2">
+              <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-green-300' : 'text-green-900'} mb-2`}>
                 Market (Optional)
               </label>
               <Input
@@ -281,27 +283,27 @@ const MarketPrice = () => {
                 placeholder="Enter market name"
                 value={selectedMarket}
                 onChange={(e) => setSelectedMarket(e.target.value)}
-                className="bg-white"
+                className={theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white'}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-green-900 mb-2">
+              <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-green-300' : 'text-green-900'} mb-2`}>
                 Date
               </label>
               <Input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="bg-white"
+                className={theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white'}
               />
             </div>
           </div>
 
           {error && (
-            <div className="flex items-center p-3 bg-yellow-50 border border-yellow-200 rounded-lg mb-4">
-              <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
-              <p className="text-yellow-800">{error}</p>
+            <div className={`flex items-center p-3 border rounded-lg mb-4 ${theme === 'dark' ? 'bg-yellow-900 border-yellow-700' : 'bg-yellow-50 border-yellow-200'}`}>
+              <AlertCircle className={`h-5 w-5 mr-2 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'}`} />
+              <p className={theme === 'dark' ? 'text-yellow-200' : 'text-yellow-800'}>{error}</p>
             </div>
           )}
 
@@ -328,19 +330,19 @@ const MarketPrice = () => {
       {/* Live API Results */}
       {apiData.length > 0 && (
         <div>
-          <h2 className="text-xl font-bold text-foreground mb-4">
+          <h2 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-foreground'}`}>
             Live Market Data - {selectedCommodity} in {selectedState}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             {apiData.slice(0, 6).map((item, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow border-green-200">
+              <Card key={index} className={`hover:shadow-lg transition-shadow ${theme === 'dark' ? 'border-gray-600 bg-gray-800' : 'border-green-200'}`}>
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     <div>
-                      <CardTitle className="text-lg text-green-800">{item.commodity || selectedCommodity}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{item.variety || "Standard"}</p>
+                      <CardTitle className={`text-lg ${theme === 'dark' ? 'text-green-400' : 'text-green-800'}`}>{item.commodity || selectedCommodity}</CardTitle>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-muted-foreground'}`}>{item.variety || "Standard"}</p>
                     </div>
-                    <Badge className="bg-green-100 text-green-800">
+                    <Badge className={theme === 'dark' ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'}>
                       <TrendingUp className="h-3 w-3 mr-1" />
                       LIVE
                     </Badge>
@@ -349,21 +351,21 @@ const MarketPrice = () => {
                 <CardContent>
                   <div className="space-y-3">
                     <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="p-2 bg-red-50 rounded">
-                        <p className="text-xs text-red-600 font-medium">MIN</p>
-                        <p className="text-lg font-bold text-red-700">
+                      <div className={`p-2 rounded ${theme === 'dark' ? 'bg-red-900' : 'bg-red-50'}`}>
+                        <p className={`text-xs font-medium ${theme === 'dark' ? 'text-red-300' : 'text-red-600'}`}>MIN</p>
+                        <p className={`text-lg font-bold ${theme === 'dark' ? 'text-red-200' : 'text-red-700'}`}>
                           ₹{item.min_price || "N/A"}
                         </p>
                       </div>
-                      <div className="p-2 bg-blue-50 rounded">
-                        <p className="text-xs text-blue-600 font-medium">MODAL</p>
-                        <p className="text-lg font-bold text-blue-700">
+                      <div className={`p-2 rounded ${theme === 'dark' ? 'bg-blue-900' : 'bg-blue-50'}`}>
+                        <p className={`text-xs font-medium ${theme === 'dark' ? 'text-blue-300' : 'text-blue-600'}`}>MODAL</p>
+                        <p className={`text-lg font-bold ${theme === 'dark' ? 'text-blue-200' : 'text-blue-700'}`}>
                           ₹{item.modal_price || "N/A"}
                         </p>
                       </div>
-                      <div className="p-2 bg-green-50 rounded">
-                        <p className="text-xs text-green-600 font-medium">MAX</p>
-                        <p className="text-lg font-bold text-green-700">
+                      <div className={`p-2 rounded ${theme === 'dark' ? 'bg-green-900' : 'bg-green-50'}`}>
+                        <p className={`text-xs font-medium ${theme === 'dark' ? 'text-green-300' : 'text-green-600'}`}>MAX</p>
+                        <p className={`text-lg font-bold ${theme === 'dark' ? 'text-green-200' : 'text-green-700'}`}>
                           ₹{item.max_price || "N/A"}
                         </p>
                       </div>
@@ -371,12 +373,12 @@ const MarketPrice = () => {
 
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center">
-                        <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>{item.market || item.district || "Market Name Not Available"}</span>
+                        <MapPin className={`h-4 w-4 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`} />
+                        <span className={theme === 'dark' ? 'text-gray-300' : ''}>{item.market || item.district || "Market Name Not Available"}</span>
                       </div>
                       <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>{item.arrival_date || selectedDate}</span>
+                        <Calendar className={`h-4 w-4 mr-2 ${theme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`} />
+                        <span className={theme === 'dark' ? 'text-gray-300' : ''}>{item.arrival_date || selectedDate}</span>
                       </div>
                     </div>
                   </div>

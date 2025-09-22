@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { User, Lock, LogIn, ArrowLeft, UserPlus, WifiOff, AlertCircle } from "lucide-react";
+import { User, Lock, LogIn, ArrowLeft, UserPlus, WifiOff, AlertCircle, Eye, EyeOff } from "lucide-react";
 import farmerHero from "@/assets/farmer-hero.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -18,7 +18,6 @@ const LoginCredentials = () => {
     password: ""
   });
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setCredentials(prev => ({ ...prev, [field]: value }));
@@ -167,14 +166,29 @@ const LoginCredentials = () => {
                   <Lock className="inline mr-2 h-4 w-4 text-blue-600" />
                   {t('password')}
                 </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder={t('enterPassword')}
-                  value={credentials.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
-                  className="h-14 mt-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300"
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder={t('enterPassword')}
+                    value={credentials.password}
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                    className="h-14 mt-2 pr-12 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
 
