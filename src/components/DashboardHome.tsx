@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Wheat, TrendingUp, Building, UserCheck, Sun, Droplets, Calendar, Bell, Mic } from "lucide-react";
+import { Wheat, TrendingUp, Building, UserCheck, Calendar, Bell, Mic } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import Weather from "@/components/Weather";
 
 const DashboardHome = () => {
   const navigate = useNavigate();
@@ -40,8 +41,6 @@ const DashboardHome = () => {
   ];
 
   const todayStats = [
-    { label: t('weather'), value: "28°C", icon: Sun, color: "text-orange-500" },
-    { label: t('rainfall'), value: "2mm", icon: Droplets, color: "text-blue-500" },
     { label: t('season'), value: "Kharif", icon: Calendar, color: "text-green-500" },
     { label: t('alerts'), value: "2 " + t('newAlerts'), icon: Bell, color: "text-red-500" }
   ];
@@ -58,17 +57,22 @@ const DashboardHome = () => {
         </p>
       </div>
 
-      {/* Today's Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {todayStats.map((stat) => (
-          <Card key={stat.label} className="text-center">
-            <CardContent className="p-4">
-              <stat.icon className={`h-8 w-8 mx-auto mb-2 ${stat.color}`} />
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
-              <p className="font-semibold text-lg">{stat.value}</p>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Weather and Stats */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <div className="md:col-span-1">
+          <Weather />
+        </div>
+        <div className="md:col-span-2 grid grid-cols-2 gap-4">
+          {todayStats.map((stat) => (
+            <Card key={stat.label} className="text-center">
+              <CardContent className="p-4">
+                <stat.icon className={`h-8 w-8 mx-auto mb-2 ${stat.color}`} />
+                <p className="text-sm text-muted-foreground">{stat.label}</p>
+                <p className="font-semibold text-lg">{stat.value}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
       {/* Voice Assistant */}
