@@ -55,37 +55,34 @@ const MyCrop = () => {
     return harvestDate.toISOString().split('T')[0];
   };
 
+  // Get current user for user-specific data
+  const getCurrentUser = () => {
+    const farmerData = localStorage.getItem('farmerData');
+    return farmerData ? JSON.parse(farmerData) : null;
+  };
+
+  const getUserCropsKey = () => {
+    const user = getCurrentUser();
+    return user ? `farmerCrops_${user.name}` : 'farmerCrops';
+  };
+
   useEffect(() => {
-    // Load crops from localStorage
-    const savedCrops = localStorage.getItem("farmerCrops");
+    const user = getCurrentUser();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    // Load crops from user-specific localStorage
+    const userCropsKey = getUserCropsKey();
+    const savedCrops = localStorage.getItem(userCropsKey);
     if (savedCrops) {
       setCrops(JSON.parse(savedCrops));
     } else {
-      // Add some sample data
-      const sampleCrops = [
-        {
-          id: 1,
-          name: "rice",
-          variety: "Basmati",
-          plantedDate: "2024-07-15",
-          expectedHarvest: "2024-11-15",
-          area: "2.5 acres",
-          status: "growing"
-        },
-        {
-          id: 2,
-          name: "wheat",
-          variety: "HD-2967",
-          plantedDate: "2024-06-10",
-          expectedHarvest: "2024-10-10",
-          area: "1.5 acres",
-          status: "flowering"
-        }
-      ];
-      setCrops(sampleCrops);
-      localStorage.setItem("farmerCrops", JSON.stringify(sampleCrops));
+      // Initialize empty crops array for new users
+      setCrops([]);
     }
-  }, []);
+  }, [navigate]);
 
   const handleAddCrop = () => {
     const expectedHarvest = calculateHarvestDate(newCrop.plantedDate, newCrop.name);
@@ -96,7 +93,7 @@ const MyCrop = () => {
     };
     const updatedCrops = [...crops, crop];
     setCrops(updatedCrops);
-    localStorage.setItem("farmerCrops", JSON.stringify(updatedCrops));
+    localStorage.setItem(getUserCropsKey(), JSON.stringify(updatedCrops));
     resetForm();
   };
 
@@ -112,14 +109,14 @@ const MyCrop = () => {
       crop.id === editingCrop.id ? { ...newCrop, expectedHarvest } : crop
     );
     setCrops(updatedCrops);
-    localStorage.setItem("farmerCrops", JSON.stringify(updatedCrops));
+    localStorage.setItem(getUserCropsKey(), JSON.stringify(updatedCrops));
     resetForm();
   };
 
   const handleDeleteCrop = (cropId: number) => {
     const updatedCrops = crops.filter(crop => crop.id !== cropId);
     setCrops(updatedCrops); 
-    localStorage.setItem("farmerCrops", JSON.stringify(updatedCrops));
+    localStorage.setItem(getUserCropsKey(), JSON.stringify(updatedCrops));
   };
 
   const resetForm = () => {

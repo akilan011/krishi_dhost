@@ -102,10 +102,14 @@ const CropSelection = () => {
       status: "growing"
     };
 
-    // Save to localStorage
-    const existingCrops = JSON.parse(localStorage.getItem("farmerCrops") || "[]");
+    // Get current user and save to user-specific localStorage
+    const farmerData = localStorage.getItem('farmerData');
+    const user = farmerData ? JSON.parse(farmerData) : null;
+    const userCropsKey = user ? `farmerCrops_${user.name}` : 'farmerCrops';
+    
+    const existingCrops = JSON.parse(localStorage.getItem(userCropsKey) || "[]");
     const updatedCrops = [...existingCrops, newCrop];
-    localStorage.setItem("farmerCrops", JSON.stringify(updatedCrops));
+    localStorage.setItem(userCropsKey, JSON.stringify(updatedCrops));
 
     // Generate notifications
     generateNotifications(newCrop);
