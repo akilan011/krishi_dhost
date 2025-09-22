@@ -13,6 +13,7 @@ const SplashScreen = () => {
   const [showVideo, setShowVideo] = useState(false);
 
   const handleSkip = () => {
+    localStorage.setItem('hasSeenSplash', 'true');
     navigate("/login");
   };
 

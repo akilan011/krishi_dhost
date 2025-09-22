@@ -25,12 +25,35 @@ import NotFound from "./pages/NotFound";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const farmerData = localStorage.getItem('farmerData');
-  return farmerData ? <>{children}</> : <Navigate to="/" replace />;
+  return farmerData ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 const HomeRoute = () => {
+  const hasSeenSplash = localStorage.getItem('hasSeenSplash');
   const farmerData = localStorage.getItem('farmerData');
-  return farmerData ? <Navigate to="/dashboard" replace /> : <SplashScreen />;
+  
+  // Always show splash screen first if not seen
+  if (!hasSeenSplash) {
+    return <SplashScreen />;
+  }
+  
+  // If user is logged in, go to dashboard
+  if (farmerData) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  // Otherwise go to login
+  return <Navigate to="/login" replace />;
+};
+
+const LoginRoute = () => {
+  const farmerData = localStorage.getItem('farmerData');
+  return farmerData ? <Navigate to="/dashboard" replace /> : <LoginCredentials />;
+};
+
+const RegisterRoute = () => {
+  const farmerData = localStorage.getItem('farmerData');
+  return farmerData ? <Navigate to="/dashboard" replace /> : <RegisterPage />;
 };
 
 const queryClient = new QueryClient();
@@ -45,8 +68,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomeRoute />} />
-            <Route path="/login" element={<LoginCredentials />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginRoute />} />
+            <Route path="/register" element={<RegisterRoute />} />
             <Route path="/crop-selection" element={<CropSelection />} />
             <Route path="/dashboard" element={<Dashboard />}>
               <Route index element={<DashboardHome />} />

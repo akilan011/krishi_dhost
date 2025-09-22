@@ -37,9 +37,8 @@ export function UserProfile() {
   };
 
   const handleLogout = () => {
-    // Keep the registration data but mark as logged out
-    const updatedData = { ...farmerData, isLoggedIn: false };
-    localStorage.setItem('farmerData', JSON.stringify(updatedData));
+    // Clear farmer data completely on logout
+    localStorage.removeItem('farmerData');
     navigate('/login');
   };
 

@@ -8,6 +8,7 @@ import { User, Lock, LogIn, ArrowLeft, UserPlus, WifiOff, AlertCircle } from "lu
 import farmerHero from "@/assets/farmer-hero.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { supabase } from "@/lib/supabase";
 
 const LoginCredentials = () => {
   const navigate = useNavigate();
@@ -17,33 +18,72 @@ const LoginCredentials = () => {
     password: ""
   });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setCredentials(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setError("");
+    setIsLoading(true);
+    
     if (!credentials.username || !credentials.password) {
       setError("Please enter both username and password");
+      setIsLoading(false);
       return;
     }
-    const savedData = localStorage.getItem("farmerData");
-    if (savedData) {
-      const farmerData = JSON.parse(savedData);
-      // Check if the user exists and password matches
-      if (farmerData.name === credentials.username && farmerData.password === credentials.password) {
-        // Mark as logged in
-        const updatedData = { ...farmerData, isLoggedIn: true };
-        localStorage.setItem('farmerData', JSON.stringify(updatedData));
-        navigate("/dashboard");
-        return;
-      } else {
-        setError("Wrong password or username. Please try again.");
+
+    try {
+      let userData = null;
+      
+      // Try Supabase first
+      try {
+        const { data, error } = await supabase
+          .from('farmers')
+          .select('*')
+          .eq('name', credentials.username)
+          .eq('password', credentials.password)
+          .single();
+
+        if (data && !error) {
+          userData = data;
+          console.log('Login successful via Supabase');
+        }
+      } catch (supabaseError) {
+        console.log('Supabase login failed, trying localStorage');
+      }
+      
+      // Fallback to localStorage if Supabase failed
+      if (!userData) {
+        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        userData = registeredUsers.find(user => 
+          user.name === credentials.username && user.password === credentials.password
+        );
+        
+        if (userData) {
+          console.log('Login successful via localStorage');
+        }
+      }
+
+      if (!userData) {
+        setError("Incorrect username or password");
+        setIsLoading(false);
         return;
       }
+
+      // Store farmer data in localStorage
+      localStorage.setItem('farmerData', JSON.stringify({
+        ...userData,
+        isLoggedIn: true
+      }));
+
+      navigate("/dashboard");
+    } catch (error) {
+      setError("Incorrect username or password");
+    } finally {
+      setIsLoading(false);
     }
-    setError("No account found. Please register first.");
   };
 
   const handleRegister = () => {
@@ -55,6 +95,12 @@ const LoginCredentials = () => {
       alert("Please enter your name to continue offline");
       return;
     }
+    // Store minimal data for offline mode
+    localStorage.setItem('farmerData', JSON.stringify({
+      name: credentials.username,
+      isOffline: true,
+      isLoggedIn: true
+    }));
     navigate("/dashboard");
   };
 
@@ -136,10 +182,11 @@ const LoginCredentials = () => {
             <div className="space-y-3 pt-6">
               <Button 
                 onClick={handleLogin}
-                className="w-full h-11 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                disabled={isLoading}
+                className="w-full h-11 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50"
               >
                 <LogIn className="mr-2 h-4 w-4" />
-                {t('login')}
+                {isLoading ? 'Logging in...' : t('login')}
               </Button>
 
               <Button 

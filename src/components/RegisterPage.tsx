@@ -5,10 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { User, MapPin, UserPlus, ArrowLeft, Lock } from "lucide-react";
+import { User, MapPin, UserPlus, ArrowLeft, Lock, Mail, AlertCircle } from "lucide-react";
 import farmerHero from "@/assets/farmer-hero.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { supabase } from "@/lib/supabase";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -21,6 +22,8 @@ const RegisterPage = () => {
     password: "",
     confirmPassword: ""
   });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Location data (same as before)
   const locationData = {
@@ -134,20 +137,100 @@ const RegisterPage = () => {
     return districtData ? districtData.villages : [];
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
+    setError("");
+    setIsLoading(true);
+    
     if (!formData.name || !formData.state || !formData.district || !formData.village || !formData.password || !formData.confirmPassword) {
-      alert("Please fill in all required fields");
+      setError("Please fill in all required fields");
+      setIsLoading(false);
       return;
     }
+    
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
+      setIsLoading(false);
       return;
     }
-    localStorage.setItem("farmerData", JSON.stringify({
-      ...formData,
-      isRegistered: true
-    }));
-    navigate("/crop-selection");
+
+    try {
+      console.log('Starting registration process...');
+      
+      // Try Supabase first, fallback to localStorage if it fails
+      try {
+        // Check if username already exists in Supabase
+        const { data: existingUser, error: checkError } = await supabase
+          .from('farmers')
+          .select('name')
+          .eq('name', formData.name)
+          .single();
+
+        if (existingUser) {
+          setError("Username already exists. Please choose a different name.");
+          setIsLoading(false);
+          return;
+        }
+
+        // Insert new farmer into Supabase
+        const { error } = await supabase
+          .from('farmers')
+          .insert({
+            name: formData.name,
+            state: formData.state,
+            district: formData.district,
+            village: formData.village,
+            password: formData.password,
+            created_at: new Date().toISOString()
+          });
+
+        if (error) {
+          throw new Error('Supabase insert failed');
+        }
+
+        console.log('Registration successful in Supabase!');
+      } catch (supabaseError) {
+        console.log('Supabase failed, using localStorage fallback');
+        
+        // Check localStorage for existing users
+        const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        const userExists = existingUsers.find(user => user.name === formData.name);
+        
+        if (userExists) {
+          setError("Username already exists. Please choose a different name.");
+          setIsLoading(false);
+          return;
+        }
+        
+        // Add to localStorage
+        existingUsers.push({
+          name: formData.name,
+          state: formData.state,
+          district: formData.district,
+          village: formData.village,
+          password: formData.password,
+          created_at: new Date().toISOString()
+        });
+        localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
+        console.log('Registration successful in localStorage!');
+      }
+      
+      // Store farmer data in localStorage for session
+      localStorage.setItem("farmerData", JSON.stringify({
+        name: formData.name,
+        state: formData.state,
+        district: formData.district,
+        village: formData.village,
+        isRegistered: true,
+        isLoggedIn: true
+      }));
+
+      navigate("/crop-selection");
+    } catch (error) {
+      console.error('Registration error:', error);
+      setError(`Registration failed: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -182,6 +265,14 @@ const RegisterPage = () => {
           </CardHeader>
           
           <CardContent className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-center space-x-3">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                <p className="text-red-700 dark:text-red-400 font-medium">{error}</p>
+              </div>
+            )}
+            
             <div className="space-y-4">
               <div>
                 <Label htmlFor="name" className="text-base font-semibold text-gray-700 dark:text-gray-300">
@@ -196,6 +287,8 @@ const RegisterPage = () => {
                   className="h-12 mt-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-emerald-500 dark:focus:border-emerald-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300"
                 />
               </div>
+
+
 
               <div>
                 <Label htmlFor="state" className="text-base font-semibold text-gray-700 dark:text-gray-300">
@@ -292,10 +385,11 @@ const RegisterPage = () => {
             <div className="pt-6">
               <Button 
                 onClick={handleRegister}
-                className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                disabled={isLoading}
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50"
               >
                 <UserPlus className="mr-2 h-5 w-5" />
-                {t('register')}
+                {isLoading ? 'Creating Account...' : t('register')}
               </Button>
             </div>
           </CardContent>
