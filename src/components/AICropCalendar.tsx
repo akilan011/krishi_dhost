@@ -11,15 +11,35 @@ const AICropCalendar = () => {
   const [selectedCrop, setSelectedCrop] = useState<any>(null);
   const [currentWeek, setCurrentWeek] = useState(0);
 
+  // Get current user for user-specific data
+  const getCurrentUser = () => {
+    const farmerData = localStorage.getItem('farmerData');
+    return farmerData ? JSON.parse(farmerData) : null;
+  };
+
+  const getUserCropsKey = () => {
+    const user = getCurrentUser();
+    return user ? `farmerCrops_${user.name}` : 'farmerCrops';
+  };
+
   useEffect(() => {
-    // Load crops from localStorage (same as MyCrop)
-    const savedCrops = localStorage.getItem("farmerCrops");
+    const user = getCurrentUser();
+    if (!user) {
+      setCrops([]);
+      return;
+    }
+
+    // Load crops from user-specific localStorage
+    const userCropsKey = getUserCropsKey();
+    const savedCrops = localStorage.getItem(userCropsKey);
     if (savedCrops) {
       const parsedCrops = JSON.parse(savedCrops);
       setCrops(parsedCrops);
       if (parsedCrops.length > 0) {
         setSelectedCrop(parsedCrops[0]);
       }
+    } else {
+      setCrops([]);
     }
   }, []);
 

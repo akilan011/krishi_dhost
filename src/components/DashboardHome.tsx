@@ -8,6 +8,26 @@ import Weather from "@/components/Weather";
 const DashboardHome = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  
+  // Get current user and time-based greeting
+  const getCurrentUser = () => {
+    const farmerData = localStorage.getItem('farmerData');
+    return farmerData ? JSON.parse(farmerData) : null;
+  };
+  
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    const user = getCurrentUser();
+    const userName = user?.name || 'Farmer';
+    
+    if (hour < 12) {
+      return `Good Morning, ${userName}!`;
+    } else if (hour < 17) {
+      return `Good Afternoon, ${userName}!`;
+    } else {
+      return `Good Evening, ${userName}!`;
+    }
+  };
 
   const quickActions = [
     {
@@ -50,7 +70,7 @@ const DashboardHome = () => {
       {/* Welcome Section */}
       <div className="bg-gradient-agricultural rounded-lg p-6 text-white">
         <h2 className="text-2xl font-bold mb-2">
-          {t('goodMorningFarmer')}
+          {getTimeBasedGreeting()}
         </h2>
         <p className="text-white/90">
           {t('farmingDashboardToday')}
