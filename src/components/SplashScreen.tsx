@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Play, X } from "lucide-react";
-import farmerHero from "@/assets/farmer-hero.jpg";
+import agriculturalLandscape from "@/assets/agricultural-landscape.jpg";
 import { useLanguage, SupportedLanguage } from "@/contexts/LanguageContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -13,7 +13,6 @@ const SplashScreen = () => {
   const [showVideo, setShowVideo] = useState(false);
 
   const handleSkip = () => {
-    localStorage.setItem('hasSeenSplash', 'true');
     navigate("/login");
   };
 
@@ -36,7 +35,7 @@ const SplashScreen = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden" style={{background: 'linear-gradient(135deg, #2d5016 0%, #3e6b1f 25%, #4a7c23 50%, #5a8f2a 75%, #6ba132 100%)'}}>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-agricultural relative overflow-hidden">
       {/* Theme Toggle */}
       <div className="absolute top-4 right-4 z-20">
         <ThemeToggle />
@@ -44,27 +43,27 @@ const SplashScreen = () => {
       {/* Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-20"
-        style={{ backgroundImage: `url(${farmerHero})` }}
+        style={{ backgroundImage: `url(${agriculturalLandscape})` }}
       />
       
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-md">
         {/* App Title */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 drop-shadow-2xl text-center" style={{fontFamily: 'Times New Roman, serif', color: '#E1D9D1'}}>
-            {t('smartCropAdvisory')}
+          <h1 className="text-4xl font-bold text-white mb-2 drop-shadow-lg">
+            🌱 {t('smartCropAdvisory')}
           </h1>
-          <h2 className="text-2xl font-semibold drop-shadow-xl" style={{fontFamily: 'Times New Roman, serif', color: '#E1D9D1'}}>
+          <h2 className="text-2xl font-semibold text-white/90 drop-shadow-md">
             {t('krishiDost')}
           </h2>
-          <p className="text-lg mt-2 drop-shadow-lg" style={{fontFamily: 'Times New Roman, serif', color: '#E1D9D1'}}>
+          <p className="text-lg text-white/80 mt-2 drop-shadow-sm">
             {t('digitalFarmingCompanion')}
           </p>
         </div>
 
         {/* Language Selection */}
         <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4 drop-shadow-xl" style={{fontFamily: 'Times New Roman, serif', color: '#E1D9D1'}}>
+          <h3 className="text-xl font-semibold text-white mb-4 drop-shadow-md">
             {t('chooseYourLanguage')}
           </h3>
           <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
@@ -73,13 +72,12 @@ const SplashScreen = () => {
                 key={lang.code}
                 onClick={() => handleLanguageSelect(lang.code)}
                 variant={language === lang.code ? "hero" : "outline"}
-                size="lg"
-                className={`text-lg font-bold py-4 px-6 ${
+                size="sm"
+                className={`text-sm font-medium ${
                   language === lang.code 
                     ? "bg-white/30 border-white/50 text-white" 
                     : "bg-white/10 border-white/20 text-white/90 hover:bg-white/20"
                 }`}
-                style={{fontFamily: 'Times New Roman, serif'}}
               >
                 {lang.name}
               </Button>
@@ -93,10 +91,10 @@ const SplashScreen = () => {
           <Button 
             onClick={handleTutorialVideo}
             variant="hero"
-            className="w-full shadow-2xl text-xl"
-            style={{fontFamily: 'Times New Roman, serif'}}
+            size="lg"
+            className="w-full text-xl py-6 shadow-2xl"
           >
-            <Play className="mr-3 h-5 w-5" />
+            <Play className="mr-3 h-6 w-6" />
             {t('tutorialVideo')}
           </Button>
 
@@ -104,15 +102,24 @@ const SplashScreen = () => {
           <Button 
             onClick={handleSkip}
             variant="outline"
-            className="w-full bg-white/10 border-white/20 text-white/90 hover:bg-white/20 hover:border-white/30 text-xl"
-            style={{fontFamily: 'Times New Roman, serif'}}
+            size="lg"
+            className="w-full text-xl py-6 bg-white/10 border-white/20 text-white/90 hover:bg-white/20 hover:border-white/30"
           >
             {t('skip')}
-            <ArrowRight className="ml-3 h-5 w-5" />
+            <ArrowRight className="ml-3 h-6 w-6" />
           </Button>
         </div>
 
-
+        {/* Loading Dots Animation */}
+        <div className="flex justify-center mt-8 space-x-2">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="w-3 h-3 bg-white/60 rounded-full animate-pulse"
+              style={{ animationDelay: `${i * 0.2}s` }}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Video Dialog */}

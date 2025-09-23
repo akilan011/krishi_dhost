@@ -5,7 +5,6 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { LocationDisplay } from "@/components/LocationDisplay";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { UserProfile } from "@/components/UserProfile";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -31,12 +30,11 @@ const Dashboard = () => {
         
         <div className="flex-1 flex flex-col">
           {/* Header */}
-          <header className={`h-16 border-b backdrop-blur-sm flex items-center px-4 shadow-sm ${theme === 'dark' ? 'bg-black/95' : 'bg-white/95'}`}>
-            <SidebarTrigger className={`mr-4 ${theme === 'dark' ? 'text-white hover:bg-gray-700' : ''}`} />
+          <header className="h-16 border-b bg-white/95 backdrop-blur-sm flex items-center px-4 shadow-sm">
+            <SidebarTrigger className={`mr-4 ${theme === 'dark' ? 'text-black hover:bg-gray-200' : ''}`} />
             <div className="flex-1">
-              <h1 className={`text-xl font-bold flex items-center gap-2 ${theme === 'light' ? 'text-primary' : 'text-lime-400'}`}>
-                <img src="https://i.postimg.cc/6yzmZ930/logo.png" alt="Krishi Dost Logo" className="h-8 w-8 bg-white p-1 rounded" />
-                {t('krishiDost')}
+              <h1 className={`text-xl font-bold ${theme === 'light' ? 'text-primary' : 'text-lime-400'}`}>
+                🌱 {t('krishiDost')}
               </h1>
               {farmerData && (
                 <p className="text-sm text-muted-foreground">
@@ -50,7 +48,6 @@ const Dashboard = () => {
                 const data = localStorage.getItem('farmerData');
                 if (data) setFarmerData(JSON.parse(data));
               }} />
-              <LanguageSelector />
               <ThemeToggle />
               <UserProfile />
             </div>

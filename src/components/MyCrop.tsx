@@ -55,42 +55,37 @@ const MyCrop = () => {
     return harvestDate.toISOString().split('T')[0];
   };
 
-  // Get current user for user-specific data
-  const getCurrentUser = () => {
-    const farmerData = localStorage.getItem('farmerData');
-    return farmerData ? JSON.parse(farmerData) : null;
-  };
-
-  const getUserCropsKey = () => {
-    const user = getCurrentUser();
-    return user ? `farmerCrops_${user.name}` : 'farmerCrops';
-  };
-
   useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
-    // Load crops from user-specific localStorage
-    const userCropsKey = getUserCropsKey();
-    const savedCrops = localStorage.getItem(userCropsKey);
+    // Load crops from localStorage
+    const savedCrops = localStorage.getItem("farmerCrops");
     if (savedCrops) {
       setCrops(JSON.parse(savedCrops));
     } else {
-      // Initialize empty crops array for new users
-      setCrops([]);
+      // Add some sample data
+      const sampleCrops = [
+        {
+          id: 1,
+          name: "rice",
+          variety: "Basmati",
+          plantedDate: "2024-07-15",
+          expectedHarvest: "2024-11-15",
+          area: "2.5 acres",
+          status: "growing"
+        },
+        {
+          id: 2,
+          name: "wheat",
+          variety: "HD-2967",
+          plantedDate: "2024-06-10",
+          expectedHarvest: "2024-10-10",
+          area: "1.5 acres",
+          status: "flowering"
+        }
+      ];
+      setCrops(sampleCrops);
+      localStorage.setItem("farmerCrops", JSON.stringify(sampleCrops));
     }
-    
-    // Update tips every hour
-    const interval = setInterval(() => {
-      // Force re-render to update dynamic tips
-      setCrops(prevCrops => [...prevCrops]);
-    }, 3600000); // 1 hour
-    
-    return () => clearInterval(interval);
-  }, [navigate]);
+  }, []);
 
   const handleAddCrop = () => {
     const expectedHarvest = calculateHarvestDate(newCrop.plantedDate, newCrop.name);
@@ -101,11 +96,7 @@ const MyCrop = () => {
     };
     const updatedCrops = [...crops, crop];
     setCrops(updatedCrops);
-    localStorage.setItem(getUserCropsKey(), JSON.stringify(updatedCrops));
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('cropsUpdated', { detail: updatedCrops }));
-    
+    localStorage.setItem("farmerCrops", JSON.stringify(updatedCrops));
     resetForm();
   };
 
@@ -121,21 +112,14 @@ const MyCrop = () => {
       crop.id === editingCrop.id ? { ...newCrop, expectedHarvest } : crop
     );
     setCrops(updatedCrops);
-    localStorage.setItem(getUserCropsKey(), JSON.stringify(updatedCrops));
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('cropsUpdated', { detail: updatedCrops }));
-    
+    localStorage.setItem("farmerCrops", JSON.stringify(updatedCrops));
     resetForm();
   };
 
   const handleDeleteCrop = (cropId: number) => {
     const updatedCrops = crops.filter(crop => crop.id !== cropId);
     setCrops(updatedCrops); 
-    localStorage.setItem(getUserCropsKey(), JSON.stringify(updatedCrops));
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('cropsUpdated', { detail: updatedCrops }));
+    localStorage.setItem("farmerCrops", JSON.stringify(updatedCrops));
   };
 
   const resetForm = () => {
@@ -171,104 +155,23 @@ const MyCrop = () => {
     }
   };
 
-  // Generate dynamic tips for all crops
-  const generateDynamicTips = () => {
-    if (crops.length === 0) return [];
-    
-    const tips = [];
-    const now = new Date();
-    
-    crops.forEach(crop => {
-      const plantedDate = new Date(crop.plantedDate);
-      const daysSincePlanted = Math.floor((now.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
-      const expectedHarvest = new Date(crop.expectedHarvest);
-      const daysToHarvest = Math.floor((expectedHarvest.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      
-      // Crop-specific schedules
-      const schedules = {
-        'rice': { fertilizer: [15, 30, 45, 65], pestControl: [20, 40, 60], weeding: [25, 45] },
-        'wheat': { fertilizer: [20, 40, 60], pestControl: [30, 50], weeding: [30, 50] },
-        'corn': { fertilizer: [15, 35, 55], pestControl: [25, 45], weeding: [20, 40] },
-        'tomato': { fertilizer: [14, 28, 42, 56], pestControl: [21, 35, 49], weeding: [20, 35, 50] }
-      };
-      
-      const cropSchedule = schedules[crop.name.toLowerCase()] || schedules['rice'];
-      
-      // Irrigation reminders (every 2-3 days)
-      if (daysSincePlanted % 3 === 0) {
-        tips.push({
-          icon: Droplets,
-          title: `${crop.name} Irrigation`,
-          description: `Water your ${crop.name} crop (Day ${daysSincePlanted}). Maintain proper soil moisture.`,
-          cropName: crop.name,
-          priority: 'high'
-        });
-      }
-      
-      // Fertilizer reminders
-      if (cropSchedule.fertilizer.includes(daysSincePlanted)) {
-        const fertilizerTypes = ['Nitrogen (N)', 'Phosphorus (P)', 'Potassium (K)', 'Micronutrients'];
-        const fertilizerIndex = cropSchedule.fertilizer.indexOf(daysSincePlanted);
-        tips.push({
-          icon: Calendar,
-          title: `${crop.name} Fertilizer Application`,
-          description: `Apply ${fertilizerTypes[fertilizerIndex]} to your ${crop.name} crop (Day ${daysSincePlanted}).`,
-          cropName: crop.name,
-          priority: 'high'
-        });
-      }
-      
-      // Pest control reminders
-      if (cropSchedule.pestControl.includes(daysSincePlanted)) {
-        tips.push({
-          icon: Bug,
-          title: `${crop.name} Pest Control`,
-          description: `Check and spray for pests in your ${crop.name} crop (Day ${daysSincePlanted}).`,
-          cropName: crop.name,
-          priority: 'moderate'
-        });
-      }
-      
-      // Weeding reminders
-      if (cropSchedule.weeding.includes(daysSincePlanted)) {
-        tips.push({
-          icon: Wheat,
-          title: `${crop.name} Weeding`,
-          description: `Remove weeds from your ${crop.name} field (Day ${daysSincePlanted}).`,
-          cropName: crop.name,
-          priority: 'moderate'
-        });
-      }
-      
-      // Harvest preparation (7 days before)
-      if (daysToHarvest <= 7 && daysToHarvest > 0) {
-        tips.push({
-          icon: Calendar,
-          title: `${crop.name} Harvest Preparation`,
-          description: `Prepare for ${crop.name} harvest in ${daysToHarvest} days. Arrange tools and labor.`,
-          cropName: crop.name,
-          priority: 'high'
-        });
-      }
-      
-      // Overdue harvest
-      if (daysToHarvest < 0) {
-        tips.push({
-          icon: Bug,
-          title: `URGENT: ${crop.name} Harvest Overdue`,
-          description: `${crop.name} harvest is ${Math.abs(daysToHarvest)} days overdue! Harvest immediately.`,
-          cropName: crop.name,
-          priority: 'urgent'
-        });
-      }
-    });
-    
-    // Sort by priority and return top 6 tips
-    const priorityOrder = { urgent: 4, high: 3, moderate: 2, low: 1 };
-    return tips.sort((a, b) => (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0)).slice(0, 6);
-  };
-  
-  const cropTips = generateDynamicTips();
+  const cropTips = [
+    {
+      icon: Droplets,
+      title: t('irrigationReminder'),
+      description: t('waterRiceCrop')
+    },
+    {
+      icon: Bug,
+      title: t('pestAlert'),
+      description: t('brownPlanthopper')
+    },
+    {
+      icon: Calendar,
+      title: t('fertilizerSchedule'),
+      description: t('applyUreaFertilizer')
+    }
+  ];
 
   return (
     <div className="space-y-6">
@@ -436,40 +339,20 @@ const MyCrop = () => {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Calendar className="mr-2 h-5 w-5" />
-            Today's Tips & Reminders
+            {t('todayTipsReminders')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {cropTips.length > 0 ? (
-              cropTips.map((tip, index) => {
-                const priorityColors = {
-                  urgent: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700',
-                  high: 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-700',
-                  moderate: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700',
-                  low: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700'
-                };
-                
-                return (
-                  <div key={index} className={`flex items-start space-x-3 p-3 rounded-lg border ${priorityColors[tip.priority] || 'bg-muted/50'}`}>
-                    <tip.icon className="h-5 w-5 text-primary mt-0.5" />
-                    <div className="flex-1">
-                      <h4 className="font-medium">{tip.title}</h4>
-                      <p className="text-sm text-muted-foreground">{tip.description}</p>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {tip.priority}
-                    </Badge>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="text-center py-6 text-muted-foreground">
-                <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No active reminders</p>
-                <p className="text-xs mt-1">Tips will appear based on your crop growth stages</p>
+            {cropTips.map((tip, index) => (
+              <div key={index} className="flex items-start space-x-3 p-3 bg-muted/50 rounded-lg">
+                <tip.icon className="h-5 w-5 text-primary mt-0.5" />
+                <div>
+                  <h4 className="font-medium">{tip.title}</h4>
+                  <p className="text-sm text-muted-foreground">{tip.description}</p>
+                </div>
               </div>
-            )}
+            ))}
           </div>
         </CardContent>
       </Card>

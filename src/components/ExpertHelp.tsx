@@ -24,9 +24,7 @@ import {
   Volume2,
   VolumeX,
   Wifi,
-  WifiOff,
-  Mic,
-  MicOff
+  WifiOff
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
@@ -37,6 +35,8 @@ const ExpertHelp = () => {
   const { toast } = useToast();
   const [selectedExpert, setSelectedExpert] = useState<any>(null);
   const [queryForm, setQueryForm] = useState({
+    category: "",
+    subject: "",
     description: ""
   });
   const [aiResponse, setAiResponse] = useState<string>("");
@@ -45,14 +45,10 @@ const ExpertHelp = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
-  const [recentQueries, setRecentQueries] = useState<any[]>([]);
-  const [isListening, setIsListening] = useState(false);
-  const [speechRecognitionSupported, setSpeechRecognitionSupported] = useState(false);
 
-  // Check for speech synthesis and recognition support
+  // Check for speech synthesis support
   useEffect(() => {
     setSpeechSupported('speechSynthesis' in window);
-    setSpeechRecognitionSupported('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
   }, []);
 
   // Online/offline detection
@@ -129,66 +125,37 @@ const ExpertHelp = () => {
     }
   ];
 
-  // Load recent queries from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('Expert_Recent_Queries');
-    if (saved) {
-      setRecentQueries(JSON.parse(saved));
+  // Recent queries
+  const recentQueries = [
+    {
+      id: 1,
+      subject: "Yellow leaves in rice crop",
+      category: "Disease Management",
+      status: "Answered",
+      expert: "Dr. Priya Sharma",
+      date: "2 hours ago",
+      replies: 3
+    },
+    {
+      id: 2,
+      subject: "Best fertilizer for wheat",
+      category: "Soil & Nutrition",
+      status: "Pending",
+      date: "5 hours ago",
+      replies: 0
+    },
+    {
+      id: 3,
+      subject: "Pest control in cotton",
+      category: "Pest Management",
+      status: "Answered",
+      expert: "Dr. Rajesh Kumar",
+      date: "1 day ago",
+      replies: 5
     }
-  }, []);
+  ];
 
-  // Save query to recent queries
-  const saveToRecentQueries = (question: string, answer: string, status: string) => {
-    const newQuery = {
-      id: Date.now(),
-      subject: question.length > 50 ? question.substring(0, 50) + '...' : question,
-      fullQuestion: question,
-      answer: answer,
-      status: status,
-      date: new Date().toLocaleString(),
-      replies: status === 'Answered' ? 1 : 0
-    };
-    
-    const existing = JSON.parse(localStorage.getItem('Expert_Recent_Queries') || '[]');
-    existing.unshift(newQuery);
-    const limited = existing.slice(0, 10); // Keep only last 10 queries
-    localStorage.setItem('Expert_Recent_Queries', JSON.stringify(limited));
-    setRecentQueries(limited);
-  };
-
-  // Local agricultural advice function
-  const getLocalAgriculturalAdvice = (question: string) => {
-    const q = question.toLowerCase();
-    
-    // Enhanced language detection for Tanglish
-    const isTanglish = (q.includes('la ') || q.includes('ku ') || q.includes('iruku') || q.includes('enna') || q.includes('epdi')) && /[a-zA-Z]/.test(question);
-    const isPureTamil = /[\u0B80-\u0BFF]/.test(question) && !/[a-zA-Z]/.test(question);
-    const isHinglish = (q.includes('kya') || q.includes('kaise') || q.includes('mein') || q.includes('hai') || q.includes('karo')) && /[a-zA-Z]/.test(question);
-    const isPureHindi = /[\u0900-\u097F]/.test(question) && !/[a-zA-Z]/.test(question);
-    
-    if (q.includes('yellowing') || q.includes('yellow') || q.includes('nitrogen') || q.includes('deficiency')) {
-      if (isTanglish) return "Rice field la yellowing problem nitrogen deficiency aagalam. Urea fertilizer 120 kg per hectare apply pannunga. Soil test pannitu proper fertilizer use pannunga.";
-      if (isPureTamil) return "நெல் வயலில் மஞ்சள் நிறம் நைட்ரஜன் குறைபாடு காரணமாகவும். யூரியா உரம் 120 kg வீதம் இடவும்.";
-      if (isHinglish) return "Rice field mein yellowing nitrogen deficiency ka sign hai. Urea fertilizer 120 kg per hectare apply karo.";
-      if (isPureHindi) return "धान के खेत में पीलापन नाइट्रोजन की कमी का संकेत है। यूरिया खाद 120 kg प्रति हेक्टेयर डालें।";
-      return "Rice field yellowing indicates nitrogen deficiency. Apply urea fertilizer 120 kg per hectare.";
-    }
-    
-    if (q.includes('fertilizer') || q.includes('nutrient')) {
-      if (isTanglish) return "Crop ku NPK fertilizer use pannunga. Nitrogen 120-150 kg/ha, Phosphorus 60-80 kg/ha apply pannunga.";
-      if (isPureTamil) return "பயிருக்கு NPK உரம் பயன்படுத்தவும்.";
-      if (isHinglish) return "Crop mein NPK fertilizer use karo. Nitrogen 120-150 kg/ha apply karo.";
-      if (isPureHindi) return "फसल में NPK खाद का उपयोग करें।";
-      return "Use NPK fertilizer for crops. Apply nitrogen 120-150 kg/ha.";
-    }
-    
-    if (isTanglish) return "General farming advice: Quality seeds use pannunga, correct spacing maintain pannunga, balanced fertilizer apply pannunga.";
-    if (isPureTamil) return "பொதுவான விவசாய ஆலோசனை: தரமான விதைகள் பயன்படுத்தவும்.";
-    if (isHinglish) return "General farming advice: Quality beej use karo, sahi spacing rakho, balanced fertilizer dalo.";
-    if (isPureHindi) return "सामान्य कृषि सलाह: गुणवत्तापूर्ण बीज का उपयोग करें।";
-    return "General farming advice: Use quality seeds, maintain proper spacing, apply balanced fertilizers.";
-  };
-
+  // Offline FAQ for common agricultural questions
   const offlineFAQ = [
     {
       question: "What are the common signs of nitrogen deficiency in crops?",
@@ -231,77 +198,6 @@ const ExpertHelp = () => {
       return;
     }
 
-    // Check if question is agriculture-related (multi-language keywords)
-    const agricultureKeywords = [
-      // English
-      'crop', 'farming', 'fertilizer', 'soil', 'plant', 'seed', 'harvest', 'pest', 'disease', 
-      'irrigation', 'agriculture', 'cultivation', 'farm', 'field', 'wheat', 'rice', 'corn',
-      'vegetable', 'fruit', 'organic', 'pesticide', 'herbicide', 'nutrient', 'growth',
-      'yield', 'weather', 'climate', 'season', 'planting', 'sowing', 'water', 'drought',
-      'livestock', 'cattle', 'poultry', 'dairy', 'manure', 'compost', 'greenhouse',
-      // Tamil/Tanglish
-      'vivasayam', 'krishi', 'nel', 'godhumai', 'cholam', 'kambu', 'ragi', 'pasu', 'koli',
-      'thanni', 'mazhai', 'bhoomi', 'mann', 'vithai', 'poo', 'keerai', 'pazham', 'maram',
-      // Tamil Unicode
-      'தக்காளி', 'செடி', 'உரம்', 'விவசாயம்', 'நெல்', 'கோதுமை', 'சோளம்', 'கம்பு', 'ராகி',
-      'தண்ணீர்', 'மழை', 'மண்', 'விதை', 'பூ', 'கீரை', 'பழம்', 'மரம்', 'பசு', 'கோழி',
-      'பயிர்', 'வயல்', 'தோட்டம்', 'இலை', 'வேர்', 'கிளை', 'பூச்சி', 'நோய்', 'மருந்து',
-      // Hindi/Hinglish + Unicode
-      'kheti', 'fasal', 'kisan', 'bhoomi', 'paani', 'beej', 'dhan', 'gehu', 'makka',
-      'sabzi', 'phal', 'pashu', 'murgi', 'barish', 'mitti', 'ugana', 'kaatna',
-      'खेती', 'फसल', 'किसान', 'भूमि', 'पानी', 'बीज', 'धान', 'गेहूं', 'मक्का',
-      'सब्जी', 'फल', 'पशु', 'मुर्गी', 'बारिश', 'मिट्टी', 'उगाना', 'काटना',
-      // Telugu
-      'వివసాయం', 'రైతు', 'కృషి', 'విత్తనం', 'మిట్ట', 'నీరు', 'పంట', 'కీడులు', 'రోగం',
-      // Punjabi
-      'ਖੇਤੀ', 'ਫਸਲ', 'ਕਿਸਾਨ', 'ਜਮੀਨ', 'ਪਾਣੀ', 'ਬੀਜ', 'ਧਾਨ', 'ਕਣਕ', 'ਮਕਈ',
-      // Malayalam
-      'കൃഷി', 'നെല്ല്', 'വിവസായം', 'വിത്ത്', 'മണ്ണ്', 'വെള്ളം', 'പശു', 'കോഴി',
-      // Urdu
-      'کاشتکاری', 'فصل', 'کسان', 'زمین', 'پانی', 'بیج', 'دھان', 'گیہوں', 'مکئی'
-    ];
-    
-    const isAgricultureRelated = agricultureKeywords.some(keyword => 
-      queryForm.description.toLowerCase().includes(keyword)
-    );
-    
-    if (!isAgricultureRelated) {
-      // Detect language and provide redirect message in same language
-      const q = queryForm.description;
-      let redirectMessage = "Please ask questions related to agriculture, farming, crops, or rural development. This app is designed to help farmers with agricultural guidance.";
-      
-      // Tamil detection
-      if (/[\u0B80-\u0BFF]/.test(q) || q.includes('la ') || q.includes('ku ') || q.includes('iruku') || q.includes('enna')) {
-        redirectMessage = "விவசாயம், வேளாண்மை, பயிர்கள் அல்லது கிராமப்புற வளர்ச்சி பற்றி கேள்விகள் கேட்கவும். இந்த ஆப் விவசாயிகளுக்கு உதவ செய்ய வசதியாக வடிவமைக்கப்பட்டது.";
-      }
-      // Hindi detection
-      else if (/[\u0900-\u097F]/.test(q) || q.includes('kya') || q.includes('kaise') || q.includes('mein') || q.includes('hai')) {
-        redirectMessage = "कृपया कृषि, खेती, फसलों, या ग्रामीण विकास से संबंधित प्रश्न पूछें। यह ऐप किसानों को कृषि मार्गदर्शन प्रदान करने के लिए बनाया गया है।";
-      }
-      // Telugu detection
-      else if (/[\u0C00-\u0C7F]/.test(q)) {
-        redirectMessage = "దయచేసి వివసాయం, వేళాన్ని పన్నులు, పంటలు, లేదా గ్రామీణ అభివృద్ధికి సంబంధించిన ప్రశ్నలు అడగండి। ఈ ఆప్ రైతులకు వేళాన్ని మార్గదర్శనం అందించడానికి రూపొందించబడింది।";
-      }
-      // Punjabi detection
-      else if (/[\u0A00-\u0A7F]/.test(q)) {
-        redirectMessage = "ਕਿਰਪਾ ਕਰਕੇ ਖੇਤੀਬਾੜੀ, ਖੇਤੀ, ਫਸਲਾਂ, ਜਾਂ ਦੇਹਾਤੀ ਵਿਕਾਸ ਨਾਲ ਸਬੰਧਤ ਸਵਾਲ ਪੁੱਛੋ। ਇਹ ਐਪ ਕਿਸਾਨਾਂ ਨੂੰ ਖੇਤੀਬਾੜੀ ਦੀ ਰਾਹਨੁਮਾਈ ਦੇਣ ਲਈ ਬਣਾਇਆ ਗਿਆ ਹੈ।";
-      }
-      // Malayalam detection
-      else if (/[\u0D00-\u0D7F]/.test(q)) {
-        redirectMessage = "കൃഷി, കൃഷിയുമായി, വിളകളുകളുമായി, അല്ലെങ്കില് ഗ്രാമീണ വികസനവുമായി ബന്ധപ്പെട്ട ചോദ്യങ്ങള് ചോദിക്കുക. ഈ ആപ്പ് കൃഷകര്ക്ക് കൃഷി മാര്ഗ്ഗദര്ശനം നല്കാനായി രൂപകല്പ്പന ചെയ്തിട്ടുള്ളതാണ്.";
-      }
-      // Urdu detection
-      else if (/[\u0600-\u06FF]/.test(q)) {
-        redirectMessage = "براہ کرم زراعت، کاشتکاری، فصلوں، یا دیہی ترقی سے متعلق سوالات پوچھیں۔ یہ ایپ کسانوں کو زراعتی رہنمائی فراہم کرنے کے لیے بنایا گیا ہے۔";
-      }
-      
-      setCurrentQuestion(queryForm.description);
-      setAiResponse(redirectMessage);
-      saveToRecentQueries(queryForm.description, redirectMessage, 'Redirected');
-      setQueryForm({ description: "" });
-      return;
-    }
-
     // Handle offline mode
     if (!isOnline) {
       const matchedFAQ = offlineFAQ.find(faq => 
@@ -312,8 +208,7 @@ const ExpertHelp = () => {
       if (matchedFAQ) {
         setCurrentQuestion(queryForm.description);
         setAiResponse(matchedFAQ.answer);
-        saveToRecentQueries(queryForm.description, matchedFAQ.answer, 'Answered');
-        setQueryForm({ description: "" });
+        setQueryForm({ category: "", subject: "", description: "" });
         toast({
           title: "Offline Mode",
           description: "Answer provided from offline knowledge base.",
@@ -333,78 +228,39 @@ const ExpertHelp = () => {
     setCurrentQuestion(queryForm.description);
     setAiResponse("");
 
-    // Check if API key is available
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    if (!apiKey || apiKey.length < 20) {
-      // Provide local agricultural advice without API
-      const localAdvice = getLocalAgriculturalAdvice(queryForm.description);
-      setAiResponse(localAdvice);
-      saveToRecentQueries(queryForm.description, localAdvice, 'Answered');
-      return;
-    }
-
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: `You are an expert agricultural advisor for the Krishi Dost app. Provide helpful, practical advice for farmers in India.
-              
-              CRITICAL LANGUAGE RULES:
-              1. If question has English + Tamil words (Tanglish), respond in SAME Tanglish style
-              2. If question has English + Hindi words (Hinglish), respond in SAME Hinglish style  
-              3. If question is pure Tamil/Hindi, respond in pure Tamil/Hindi
-              4. NEVER convert Tanglish to pure Tamil or Hinglish to pure Hindi
-              
-              Tanglish Examples:
-              Q: "Tomato crop la pest problem iruku" → A: "Tomato crop ku neem oil spray pannunga, pest control ku IPM method use pannunga"
-              Q: "Rice field la yellowing problem" → A: "Rice field la nitrogen deficiency irukalam, urea fertilizer apply pannunga"
-              
-              Hinglish Examples:
-              Q: "Wheat mein kya fertilizer use karu" → A: "Wheat mein NPK fertilizer use karo, soil test karke apply karo"
-              
-              Keep responses practical and in the EXACT SAME language mix as the question.`
-            },
-            {
-              role: 'user',
-              content: `Please respond to this question in the SAME LANGUAGE it was asked: "${queryForm.description}"`
-            }
-          ],
-          max_tokens: 500,
-          temperature: 0.7
-        })
+      const { data, error } = await supabase.functions.invoke('ai-expert', {
+        body: { question: queryForm.description }
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (error) {
+        throw error;
       }
 
-      const data = await response.json();
-      
-      if (data.choices && data.choices[0] && data.choices[0].message) {
-        const response = data.choices[0].message.content;
-        setAiResponse(response);
-        saveToRecentQueries(queryForm.description, response, 'Answered');
+      if (data.answer) {
+        setAiResponse(data.answer);
       } else {
-        throw new Error("No response received from ChatGPT");
+        throw new Error("No response received");
       }
     } catch (error) {
-      console.error("Error getting ChatGPT response:", error);
+      console.error("Error getting AI response:", error);
       
-      // Provide local agricultural advice as fallback
-      const localAdvice = getLocalAgriculturalAdvice(queryForm.description);
-      setAiResponse(localAdvice);
-      saveToRecentQueries(queryForm.description, localAdvice, 'Answered');
+      // Provide offline fallback if network error
+      if (!navigator.onLine) {
+        const fallbackFAQ = offlineFAQ[0]; // Provide a general answer
+        setAiResponse("I couldn't connect to get the latest advice, but here's some general guidance: " + fallbackFAQ.answer);
+      } else {
+        setAiResponse("I couldn't find an answer right now. Please try again or check your internet connection.");
+      }
+      
+      toast({
+        title: "Connection Error",
+        description: "Failed to get expert advice. Please check your internet connection.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
-      setQueryForm({ description: "" });
+      setQueryForm({ category: "", subject: "", description: "" });
     }
   };
 
@@ -418,6 +274,7 @@ const ExpertHelp = () => {
       return;
     }
 
+    // Cancel any ongoing speech
     window.speechSynthesis.cancel();
     
     if (isSpeaking) {
@@ -425,145 +282,23 @@ const ExpertHelp = () => {
       return;
     }
 
-    const hasTamil = /[\u0B80-\u0BFF]/.test(text);
-    const hasEnglish = /[a-zA-Z]/.test(text);
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.8;
+    utterance.pitch = 1;
+    utterance.volume = 0.8;
     
-    console.log('Text analysis:', { text: text.substring(0, 100), hasTamil, hasEnglish });
-
-    const speak = () => {
-      const voices = window.speechSynthesis.getVoices();
-      console.log('All available voices:', voices.map(v => `${v.name} (${v.lang})`));
-      
-      // Check for Tamil voices
-      const tamilVoices = voices.filter(v => 
-        v.lang === 'ta-IN' || 
-        v.lang === 'ta' || 
-        v.lang.startsWith('ta') || 
-        v.name.toLowerCase().includes('tamil')
-      );
-      
-      console.log('Tamil voices found:', tamilVoices.map(v => `${v.name} (${v.lang})`));
-      
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.8;
-      utterance.pitch = 1;
-      utterance.volume = 1;
-      
-      let selectedVoice = null;
-      
-      // For Tamil content
-      if (hasTamil) {
-        if (tamilVoices.length > 0) {
-          selectedVoice = tamilVoices[0];
-          utterance.lang = selectedVoice.lang;
-          utterance.voice = selectedVoice;
-          console.log(`Using Tamil voice: ${selectedVoice.name} (${selectedVoice.lang})`);
-        } else {
-          // No Tamil voice available - notify user and use English
-          console.log('No Tamil voice available on this system');
-          toast({
-            title: "Tamil Voice Not Available",
-            description: "Your system doesn't have Tamil text-to-speech voices installed. Using English voice instead.",
-            variant: "default"
-          });
-          utterance.lang = 'en-US';
-          selectedVoice = voices.find(v => v.lang.startsWith('en'));
-        }
-      } else {
-        // For English/mixed content
-        utterance.lang = 'en-US';
-        selectedVoice = voices.find(v => v.lang.startsWith('en') && v.default) ||
-                      voices.find(v => v.lang.startsWith('en'));
-      }
-      
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-      }
-      
-      console.log(`Final voice selection: ${selectedVoice?.name || 'default'} (${utterance.lang})`);
-      
-      utterance.onstart = () => {
-        console.log('Speech started');
-        setIsSpeaking(true);
-      };
-      
-      utterance.onend = () => {
-        console.log('Speech ended');
-        setIsSpeaking(false);
-      };
-      
-      utterance.onerror = (event) => {
-        console.error('Speech error:', event.error);
-        setIsSpeaking(false);
-        toast({
-          title: "Speech Error",
-          description: `TTS failed: ${event.error}`,
-          variant: "destructive"
-        });
-      };
-      
-      window.speechSynthesis.speak(utterance);
-    };
-
-    // Wait for voices to load
-    if (window.speechSynthesis.getVoices().length === 0) {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null;
-        setTimeout(speak, 100);
-      };
-      // Force load voices
-      setTimeout(() => {
-        const tempUtterance = new SpeechSynthesisUtterance('');
-        window.speechSynthesis.speak(tempUtterance);
-        window.speechSynthesis.cancel();
-      }, 50);
-    } else {
-      speak();
-    }
-  };
-
-  const startVoiceInput = () => {
-    if (!speechRecognitionSupported) {
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => {
+      setIsSpeaking(false);
       toast({
-        title: "Voice Input Not Supported",
-        description: "Your browser doesn't support voice recognition.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-    const recognition = new SpeechRecognition();
-    
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US'; // Default, but will auto-detect
-
-    recognition.onstart = () => {
-      setIsListening(true);
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setQueryForm({...queryForm, description: transcript});
-      setIsListening(false);
-    };
-
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
-      setIsListening(false);
-      toast({
-        title: "Voice Input Error",
-        description: "Failed to recognize speech. Please try again.",
+        title: "Speech Error",
+        description: "Failed to play audio response.",
         variant: "destructive"
       });
     };
 
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognition.start();
+    window.speechSynthesis.speak(utterance);
   };
 
   const getAvailabilityColor = (availability: string) => {
@@ -580,7 +315,6 @@ const ExpertHelp = () => {
       case "Answered": return "bg-green-100 text-green-800";
       case "Pending": return "bg-yellow-100 text-yellow-800";
       case "In Progress": return "bg-blue-100 text-blue-800";
-      case "Redirected": return "bg-red-100 text-red-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -642,30 +376,38 @@ const ExpertHelp = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium">{t('askQuestion')}</label>
-                <div className="relative">
-                  <Textarea
-                    placeholder="Ask in any language - English, Hindi, Tamil, Tanglish, or mixed languages (e.g., 'Tomato crop la pest problem iruku, enna solution?')..."
-                    value={queryForm.description}
-                    onChange={(e) => setQueryForm({...queryForm, description: e.target.value})}
-                    rows={4}
-                    className="pr-12"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className={`absolute top-2 right-2 h-8 w-8 p-0 ${isListening ? 'text-red-500 animate-pulse' : 'text-muted-foreground hover:text-primary'}`}
-                    onClick={startVoiceInput}
-                    disabled={!speechRecognitionSupported || isListening}
-                    title={speechRecognitionSupported ? (isListening ? 'Listening...' : 'Click to speak in any language') : 'Voice input not supported'}
-                  >
-                    {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                  </Button>
-                </div>
-                {isListening && (
-                  <p className="text-sm text-primary animate-pulse">🎤 Listening... Speak in any language</p>
-                )}
+                <label className="text-sm font-medium">{t('category')}</label>
+                <Select onValueChange={(value) => setQueryForm({...queryForm, category: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('selectCategory')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">{t('subject')}</label>
+                <Input
+                  placeholder={t('briefDescription')}
+                  value={queryForm.subject}
+                  onChange={(e) => setQueryForm({...queryForm, subject: e.target.value})}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">{t('detailedDescription')}</label>
+                <Textarea
+                  placeholder={t('describeProblem')}
+                  value={queryForm.description}
+                  onChange={(e) => setQueryForm({...queryForm, description: e.target.value})}
+                  rows={4}
+                />
               </div>
 
               <Button 
@@ -677,12 +419,12 @@ const ExpertHelp = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Getting Expert Response...
+                    Fetching Expert Advice...
                   </>
                 ) : (
                   <>
                     <Send className="mr-2 h-5 w-5" />
-                    {isOnline ? 'Ask Agricultural Expert' : 'Ask (Offline Mode)'}
+                    {isOnline ? t('submitQuestion') : 'Ask (Offline Mode)'}
                   </>
                 )}
               </Button>
@@ -695,7 +437,7 @@ const ExpertHelp = () => {
               <CardHeader>
                 <CardTitle className="flex items-center text-primary">
                   <Bot className="mr-2 h-5 w-5" />
-                  Agricultural Expert
+                  AI Agricultural Expert
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -709,56 +451,31 @@ const ExpertHelp = () => {
                 {isLoading ? (
                   <div className="flex items-center justify-center p-8">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <span className="ml-3 text-lg">Getting expert response...</span>
+                    <span className="ml-3 text-lg">Fetching expert advice...</span>
                   </div>
                 ) : aiResponse ? (
                   <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
                     <div className="flex items-center justify-between mb-3">
                       <p className="font-medium text-primary">Expert Advice:</p>
                       {speechSupported && (
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              const voices = window.speechSynthesis.getVoices();
-                              const tamilVoices = voices.filter(v => 
-                                v.lang.includes('ta') || v.name.toLowerCase().includes('tamil')
-                              );
-                              console.log('=== VOICE DEBUG ===');
-                              console.log('Total voices:', voices.length);
-                              console.log('Tamil voices:', tamilVoices.length);
-                              console.log('All voices:', voices.map(v => `${v.name} (${v.lang})`));
-                              toast({
-                                title: "Voice Debug",
-                                description: `Found ${voices.length} total voices, ${tamilVoices.length} Tamil voices. Check console for details.`,
-                              });
-                            }}
-                            className="text-xs px-2"
-                            title="Debug: Show available voices"
-                          >
-                            Debug
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => speakResponse(aiResponse)}
-                            className="flex items-center"
-                            title="Click to hear the response. Note: Tamil TTS requires Tamil language pack to be installed on your system."
-                          >
-                            {isSpeaking ? (
-                              <>
-                                <VolumeX className="h-4 w-4 mr-1" />
-                                Stop
-                              </>
-                            ) : (
-                              <>
-                                <Volume2 className="h-4 w-4 mr-1" />
-                                Listen
-                              </>
-                            )}
-                          </Button>
-                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => speakResponse(aiResponse)}
+                          className="flex items-center"
+                        >
+                          {isSpeaking ? (
+                            <>
+                              <VolumeX className="h-4 w-4 mr-1" />
+                              Stop
+                            </>
+                          ) : (
+                            <>
+                              <Volume2 className="h-4 w-4 mr-1" />
+                              Listen
+                            </>
+                          )}
+                        </Button>
                       )}
                     </div>
                     <p className="text-foreground text-lg leading-relaxed whitespace-pre-wrap">{aiResponse}</p>
@@ -776,33 +493,29 @@ const ExpertHelp = () => {
             <CardContent>
               <div className="space-y-3">
                 {isOnline ? (
-                  recentQueries.length > 0 ? (
-                    recentQueries.map((query) => (
-                      <div key={query.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer"
-                           onClick={() => {
-                             setCurrentQuestion(query.fullQuestion);
-                             setAiResponse(query.answer);
-                           }}>
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-medium">{query.subject}</h4>
-                          <Badge className={getStatusColor(query.status)}>
-                            {query.status}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground space-x-4">
-                          <span>{query.date}</span>
-                          {query.replies > 0 && (
-                            <span className="flex items-center">
-                              <MessageCircle className="h-3 w-3 mr-1" />
-                              {query.replies} replies
-                            </span>
-                          )}
-                        </div>
+                  recentQueries.map((query) => (
+                    <div key={query.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium">{query.subject}</h4>
+                        <Badge className={getStatusColor(query.status)}>
+                          {query.status}
+                        </Badge>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground text-center py-4">No recent queries yet. Ask your first question!</p>
-                  )
+                      <div className="flex items-center text-sm text-muted-foreground space-x-4">
+                        <span>{query.category}</span>
+                        <span>{query.date}</span>
+                        {query.replies > 0 && (
+                          <span className="flex items-center">
+                            <MessageCircle className="h-3 w-3 mr-1" />
+                            {query.replies} replies
+                          </span>
+                        )}
+                      </div>
+                      {query.expert && (
+                        <p className="text-sm text-primary mt-1">{t('answeredBy')} {query.expert}</p>
+                      )}
+                    </div>
+                  ))
                 ) : (
                   offlineFAQ.map((faq, index) => (
                     <div key={index} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer"
